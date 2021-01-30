@@ -1,0 +1,7 @@
+{
+  "name": "DSP-Calculator",
+  "version": "0.0.1",
+  "dependencies": {
+    "umi": "^3.3.7"
+  }
+}
