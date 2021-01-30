@@ -1,0 +1,21 @@
+[
+  {
+    "name": "a",
+    "yieldPerSecond": 0.5,
+    "isHighEfficiency": false,
+    "materials": {
+      "b": 2,
+      "c": 3
+    }
+  },
+  {
+    "name": "b",
+    "yieldPerSecond": 1,
+    "isHighEfficiency": true,
+    "materials": {
+      "c": 2,
+      "d": 3,
+      "e": 5
+    }
+  }
+]
