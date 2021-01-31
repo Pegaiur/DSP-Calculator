@@ -1,21 +1,102 @@
 [
   {
-    "name": "a",
-    "yieldPerSecond": 0.5,
+    "name": "铁块",
+    "yieldPerMin": 60,
+    "yield": 1,
     "isHighEfficiency": false,
-    "materials": {
-      "b": 2,
-      "c": 3
-    }
+    "materials": [
+      {
+        "name": "铁矿",
+        "quantity": 1
+      }
+    ]
   },
   {
-    "name": "b",
-    "yieldPerSecond": 1,
-    "isHighEfficiency": true,
-    "materials": {
-      "c": 2,
-      "d": 3,
-      "e": 5
-    }
+    "name": "磁铁",
+    "yieldPerMin": 40,
+    "yield": 1,
+    "isHighEfficiency": false,
+    "materials": [
+      {
+        "name": "铁矿",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "name": "铜块",
+    "yieldPerMin": 60,
+    "yield": 1,
+    "isHighEfficiency": false,
+    "materials": [
+      {
+        "name": "铜矿",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "name": "磁线圈",
+    "yieldPerMin": 120,
+    "yield": 2,
+    "isHighEfficiency": false,
+    "materials": [
+      {
+        "name": "磁铁",
+        "quantity": 2
+      },
+      {
+        "name": "铜块",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "name": "齿轮",
+    "yieldPerMin": 60,
+    "yield": 1,
+    "isHighEfficiency": false,
+    "materials": [
+      {
+        "name": "铁块",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "name": "电动机",
+    "yieldPerMin": 30,
+    "yield": 1,
+    "isHighEfficiency": false,
+    "materials": [
+      {
+        "name": "铁块",
+        "quantity": 2
+      },
+      {
+        "name": "齿轮",
+        "quantity": 1
+      },
+      {
+        "name": "磁线圈",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "name": "电磁涡轮",
+    "yieldPerMin": 30,
+    "yield": 1,
+    "isHighEfficiency": false,
+    "materials": [
+      {
+        "name": "电动机",
+        "quantity": 2
+      },
+      {
+        "name": "磁线圈",
+        "quantity": 2
+      }
+    ]
   }
 ]
