@@ -1,44 +1,56 @@
 import React from 'react';
+import ReactDOM from 'react-dom';
 import styles from './index.less';
-import { testObject, ItemModel, sumReport, allItemNames } from '../main';
+import { ItemModel, allItems } from '../main';
+import InputPanel from '../components/inputPanel';
 import ItemEntry from '../components/item';
 import SumReportPanel from '../components/sumReport';
 
 import { render } from 'react-dom';
 
-let requiredYieldPerMin = 100;
+interface IProps {}
 
-const itemSelect = (
-  <select name="物品">
-    {allItemNames.map((name, index) => {
-      return (
-        <option value={name} key={index}>
-          {name}
-        </option>
-      );
-    })}{' '}
-    s
-  </select>
-);
-
-function calculate() {
-  requiredYieldPerMin = 0;
+interface IState {
+  expectedYieldPerMin: number;
+  targetItem?: ItemModel;
 }
 
-export default function IndexPage() {
-  return (
-    <div>
-      <h1>产量计算</h1>
-      <h2>选择物品</h2>
-      {itemSelect}
-      <h2>输入期望产量</h2>
-      <input type="text" />
-      <button onClick={calculate}>计算</button>
-      {/* <ItemEntry item={testObject} requiredYieldPerMin={requiredYieldPerMin} /> */}
-      <SumReportPanel
-        item={testObject}
-        requiredYieldPerMin={requiredYieldPerMin}
-      ></SumReportPanel>
-    </div>
-  );
+export default class IndexPage extends React.Component<IProps, IState> {
+  constructor(props: IProps, state: IState) {
+    super(props, state);
+
+    this.calculate = this.calculate.bind(this);
+
+    this.state = {
+      expectedYieldPerMin: 0,
+    };
+  }
+
+  calculate(targetItem: string, expectedValue: number) {
+    const targetItemModel = allItems[targetItem];
+    this.setState({
+      targetItem: targetItemModel,
+      expectedYieldPerMin: expectedValue,
+    });
+  }
+
+  render() {
+    let sumPanel = <div></div>;
+    if (this.state.targetItem != undefined) {
+      sumPanel = (
+        <SumReportPanel
+          item={this.state.targetItem}
+          requiredYieldPerMin={this.state.expectedYieldPerMin}
+        />
+      );
+    }
+    return (
+      <div>
+        <h1>戴森球计划产量计算</h1>
+        <InputPanel calculate={this.calculate}></InputPanel>
+        {/* <ItemEntry item={testObject} requiredYieldPerMin={requiredYieldPerMin} /> */}
+        {sumPanel}
+      </div>
+    );
+  }
 }

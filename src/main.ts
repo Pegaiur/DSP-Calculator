@@ -10,7 +10,7 @@ const allMinerals: { [key: string]: number } = {
 };
 const jsonItems: ItemModel[] = data.default;
 export const allItemNames: string[] = [];
-let allItems: { [key: string]: ItemModel } = {};
+export let allItems: { [key: string]: ItemModel } = {};
 jsonItems.map((item) => {
   item.ratePerMin = item.yieldPerMin / item.yield;
   item.materials.map((material) => {
