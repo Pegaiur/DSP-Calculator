@@ -1,11 +1,14 @@
 import React from 'react';
 import { ItemModel, getMaterial } from '../main';
 
-export class ItemEntry extends React.Component {
-  constructor(props: ItemModel) {
-    super(props);
-  }
+interface IProps {
+  item: ItemModel;
+  requiredYieldPerMin: number;
+}
 
+interface IState {}
+
+export default class ItemEntry extends React.Component<IProps, IState> {
   render() {
     return (
       <div>
