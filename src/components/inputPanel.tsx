@@ -22,7 +22,7 @@ export default class InputPanel extends React.Component<IProps, IState> {
     this.state = {
       expectedValue: 0,
       warning: true,
-      targetItem: '',
+      targetItem: allItemNames[0],
     };
   }
 
@@ -45,7 +45,7 @@ export default class InputPanel extends React.Component<IProps, IState> {
 
   render() {
     const warningLabel = this.state.warning ? (
-      <h3>请输入期望产量数字</h3>
+      <h3>请输入期望产量数字（单位：个/分钟）</h3>
     ) : (
       <div></div>
     );
@@ -61,8 +61,7 @@ export default class InputPanel extends React.Component<IProps, IState> {
           {allItemNames.map((name, index) => {
             return (
               <option value={name} key={index}>
-                {' '}
-                {name}{' '}
+                {name}
               </option>
             );
           })}

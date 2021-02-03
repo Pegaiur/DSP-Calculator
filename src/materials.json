@@ -1,7 +1,7 @@
 [
   {
     "name": "铁块",
-    "yieldPerMin": 60,
+    "time": 1,
     "yield": 1,
     "isHighEfficiency": false,
     "materials": [
@@ -13,7 +13,7 @@
   },
   {
     "name": "磁铁",
-    "yieldPerMin": 40,
+    "time": 1.5,
     "yield": 1,
     "isHighEfficiency": false,
     "materials": [
@@ -25,7 +25,7 @@
   },
   {
     "name": "铜块",
-    "yieldPerMin": 60,
+    "time": 1,
     "yield": 1,
     "isHighEfficiency": false,
     "materials": [
@@ -37,7 +37,7 @@
   },
   {
     "name": "磁线圈",
-    "yieldPerMin": 120,
+    "time": 1,
     "yield": 2,
     "isHighEfficiency": false,
     "materials": [
@@ -53,7 +53,7 @@
   },
   {
     "name": "齿轮",
-    "yieldPerMin": 60,
+    "time": 1,
     "yield": 1,
     "isHighEfficiency": false,
     "materials": [
@@ -65,7 +65,7 @@
   },
   {
     "name": "电动机",
-    "yieldPerMin": 30,
+    "time": 2,
     "yield": 1,
     "isHighEfficiency": false,
     "materials": [
@@ -85,7 +85,7 @@
   },
   {
     "name": "电磁涡轮",
-    "yieldPerMin": 30,
+    "time": 2,
     "yield": 1,
     "isHighEfficiency": false,
     "materials": [

@@ -1,5 +1,22 @@
 import * as data from './materials.json';
 
+export interface ItemModel {
+  name: string;
+  time: number;
+  yield: number;
+  ratePerMin: number;
+  yieldPerMin: number;
+  isHighEfficiency: boolean;
+  materials: Material[];
+}
+
+export interface Material {
+  name: string;
+  quantity: number;
+  requiredYieldPerMin: number;
+  isMineral: boolean;
+}
+
 const allMinerals: { [key: string]: number } = {
   铁矿: 1,
   铜矿: 1,
@@ -12,7 +29,8 @@ const jsonItems: ItemModel[] = data.default;
 export const allItemNames: string[] = [];
 export let allItems: { [key: string]: ItemModel } = {};
 jsonItems.map((item) => {
-  item.ratePerMin = item.yieldPerMin / item.yield;
+  item.ratePerMin = 60 / item.time;
+  item.yieldPerMin = item.ratePerMin * item.yield;
   item.materials.map((material) => {
     material.requiredYieldPerMin = material.quantity * item.ratePerMin;
     material.isMineral = allMinerals[material.name] == 1;
@@ -20,24 +38,6 @@ jsonItems.map((item) => {
   allItems[item.name] = item;
   allItemNames.push(item.name);
 });
-
-export interface ItemModel {
-  name: string;
-  yieldPerMin: number;
-  yield: number;
-  ratePerMin: number;
-  isHighEfficiency: boolean;
-  materials: Material[];
-}
-
-export interface Material {
-  name: string;
-  quantity: number;
-  requiredYieldPerMin: number;
-  isMineral: boolean;
-}
-
-export const testObject = allItems['电磁涡轮'];
 
 export function getMaterial(material: Material) {
   return allItems[material.name];
