@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import styles from './index.less';
-import { ItemModel, allItems } from '../main';
+// import { ItemModel, allItems } from '../main';
 import InputPanel from '../components/inputPanel';
 import ItemEntry from '../components/item';
 import SumReportPanel from '../components/sumReport';
@@ -12,7 +12,7 @@ interface IProps {}
 
 interface IState {
   expectedYieldPerMin: number;
-  targetItem?: ItemModel;
+  targetItem?: string;
 }
 
 export default class IndexPage extends React.Component<IProps, IState> {
@@ -27,9 +27,8 @@ export default class IndexPage extends React.Component<IProps, IState> {
   }
 
   calculate(targetItem: string, expectedValue: number) {
-    const targetItemModel = allItems[targetItem];
     this.setState({
-      targetItem: targetItemModel,
+      targetItem: targetItem,
       expectedYieldPerMin: expectedValue,
     });
   }

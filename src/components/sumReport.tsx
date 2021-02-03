@@ -1,8 +1,8 @@
 import React from 'react';
-import { sumReport, ItemModel } from '../main';
+import { sumReport } from '../main';
 
 interface IProps {
-  item: ItemModel;
+  item: string;
   requiredYieldPerMin: number;
 }
 interface IState {}

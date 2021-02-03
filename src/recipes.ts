@@ -1,3 +1,5 @@
+import { minerals } from './minerals';
+
 export interface RecipeModel {
   products: { [name: string]: number };
   materials: { [name: string]: number };
@@ -13,6 +15,21 @@ enum ProcessBuilding {
   fractionatingTower, //分馏塔
   collider, //粒子对撞机
   institute, //研究站
+}
+
+export function calculateMaterialRequirements(
+  recipe: RecipeModel,
+  targetProduct: string,
+  targetMaterial: string,
+  expectedYieldPerMin: number,
+) {
+  const rate = 60 / recipe.time;
+  const yieldPerMin = rate * recipe.products[targetProduct];
+  return (
+    (expectedYieldPerMin / yieldPerMin) *
+    recipe.materials[targetMaterial] *
+    rate
+  );
 }
 
 // high efficiency recipes

@@ -80,13 +80,13 @@ const buildings = [
 
 export const allItemNames: { [tier: string]: string[] } = {
   物品等级9: tier9,
-  物品等级8: tier9,
-  物品等级7: tier9,
-  物品等级6: tier9,
-  物品等级5: tier9,
-  物品等级4: tier9,
-  物品等级3: tier9,
-  物品等级2: tier9,
-  物品等级1: tier9,
+  物品等级8: tier8,
+  物品等级7: tier7,
+  物品等级6: tier6,
+  物品等级5: tier5,
+  物品等级4: tier4,
+  物品等级3: tier3,
+  物品等级2: tier2,
+  物品等级1: tier1,
   建筑: buildings,
 };

@@ -1,5 +1,5 @@
-import React, { SyntheticEvent } from 'react';
-import { allItemNames } from '../main';
+import React from 'react';
+import ItemSelect from './itemSelect';
 
 interface IProps {
   calculate(targetItem: string, expectedValue: number): void;
@@ -22,7 +22,7 @@ export default class InputPanel extends React.Component<IProps, IState> {
     this.state = {
       expectedValue: 0,
       warning: true,
-      targetItem: allItemNames[0],
+      targetItem: '宇宙矩阵',
     };
   }
 
@@ -39,8 +39,8 @@ export default class InputPanel extends React.Component<IProps, IState> {
     this.props.calculate(this.state.targetItem, this.state.expectedValue);
   }
 
-  handleSelect(event: React.ChangeEvent<HTMLSelectElement>) {
-    this.setState({ targetItem: event.currentTarget.value });
+  handleSelect(value: string) {
+    this.setState({ targetItem: value });
   }
 
   render() {
@@ -53,19 +53,7 @@ export default class InputPanel extends React.Component<IProps, IState> {
     return (
       <div>
         <h2>目标物品</h2>
-        <select
-          name="物品"
-          value={this.state.targetItem}
-          onChange={this.handleSelect}
-        >
-          {allItemNames.map((name, index) => {
-            return (
-              <option value={name} key={index}>
-                {name}
-              </option>
-            );
-          })}
-        </select>
+        <ItemSelect onChange={this.handleSelect} />
         <h2>期望产量：</h2>
         <input
           type="text"
