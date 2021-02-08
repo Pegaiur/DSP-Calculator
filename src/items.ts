@@ -1,3 +1,4 @@
+const tier0 = ['铁矿', '铜矿', '石矿', '煤矿', '钛石', '水', '原油'];
 const tier1 = [
   '铁块',
   '磁铁',
@@ -88,5 +89,14 @@ export const allItemNames: { [tier: string]: string[] } = {
   物品等级3: tier3,
   物品等级2: tier2,
   物品等级1: tier1,
+  物品等级0: tier0,
   建筑: buildings,
 };
+
+export let allItemNameArray: string[];
+
+let array: string[] = [];
+for (let key in allItemNames) {
+  array = array.concat(allItemNames[key]);
+}
+allItemNameArray = array;

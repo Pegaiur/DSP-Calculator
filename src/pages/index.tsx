@@ -1,10 +1,9 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
 import styles from './index.less';
-// import { ItemModel, allItems } from '../main';
-import InputPanel from '../components/inputPanel';
-import ItemEntry from '../components/item';
-import SumReportPanel from '../components/sumReport';
+import InputPanel from '../components/InputPanel';
+import ResultList from '../components/ResultList';
+import SumReportPanel from '../components/SumReport';
+import { ResultModel } from '../main';
 
 import { render } from 'react-dom';
 
@@ -46,8 +45,11 @@ export default class IndexPage extends React.Component<IProps, IState> {
     return (
       <div>
         <h1>戴森球计划产量计算</h1>
-        <InputPanel calculate={this.calculate}></InputPanel>
-        {/* <ItemEntry item={testObject} requiredYieldPerMin={requiredYieldPerMin} /> */}
+        <InputPanel calculate={this.calculate} />
+        <ResultList
+          targetItem={this.state.targetItem}
+          expectedYieldPerMin={this.state.expectedYieldPerMin}
+        />
         {sumPanel}
       </div>
     );

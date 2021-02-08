@@ -1,5 +1,5 @@
 import React from 'react';
-import ItemSelect from './itemSelect';
+import ItemSelect from './ItemSelect';
 
 interface IProps {
   calculate(targetItem: string, expectedValue: number): void;

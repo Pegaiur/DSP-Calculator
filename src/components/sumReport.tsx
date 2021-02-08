@@ -1,5 +1,5 @@
 import React from 'react';
-import { sumReport } from '../main';
+// import { sumReport } from '../main';
 
 interface IProps {
   item: string;
@@ -12,9 +12,9 @@ export default class SumReportPanel extends React.Component<IProps, IState> {
     return (
       <div>
         <h1>总计</h1>
-        {JSON.stringify(
+        {/* {JSON.stringify(
           sumReport(this.props.item, this.props.requiredYieldPerMin),
-        )}
+        )} */}
       </div>
     );
   }
