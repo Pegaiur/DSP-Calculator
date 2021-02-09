@@ -1,9 +1,11 @@
 import { RecipeModel, calculateMaterialYPM, getRecipe } from './recipes';
 import { allItemNameArray } from './items';
+import ResultList from './components/ResultList';
 // import { minerals } from './minerals';
 
 export interface ResultModel {
   targetProduct: string;
+  targetMaterial?: string;
   recipe: RecipeModel;
   yieldPerMin: number;
 }
@@ -27,6 +29,7 @@ export function calculateResults(item: string, expectedYieldPerMin: number) {
         recipe,
         expectedYieldPerMin,
       );
+      addResult(results, material, recipe, materialExpectedYieldPerMin, item); // result for item consumption detail
       const subResults = calculateResults(
         material,
         materialExpectedYieldPerMin,
@@ -42,9 +45,11 @@ function addResult(
   item: string,
   recipe: RecipeModel,
   expectedYieldPerMin: number,
+  targetProduct?: string, // information for item consumption detail
 ) {
   let resultAdded = false;
   if (results[item] != undefined) {
+    // in case of hydrogen production
     results[item].forEach((result) => {
       if (result.recipe == recipe) {
         result.yieldPerMin += expectedYieldPerMin;
@@ -58,6 +63,14 @@ function addResult(
       recipe: recipe,
       yieldPerMin: expectedYieldPerMin,
     };
+    if (targetProduct != undefined) {
+      result = {
+        targetProduct: targetProduct,
+        targetMaterial: item,
+        recipe: recipe,
+        yieldPerMin: expectedYieldPerMin,
+      };
+    }
     if (results[item] == undefined) {
       results[item] = [];
     }
@@ -71,7 +84,17 @@ function mergeResults(
 ) {
   for (let item in resultsToMerge) {
     resultsToMerge[item].forEach((result) => {
-      addResult(results, item, result.recipe, result.yieldPerMin);
+      if (result.targetMaterial != undefined) {
+        addResult(
+          results,
+          result.targetMaterial,
+          result.recipe,
+          result.yieldPerMin,
+          result.targetProduct,
+        );
+      } else {
+        addResult(results, item, result.recipe, result.yieldPerMin);
+      }
     });
   }
 }
@@ -80,20 +103,36 @@ export function flattenResults(results: ResultModel[]) {
   let productions: FlatResultModel[] = [];
   let consumptions: FlatResultModel[] = [];
   results.forEach((result) => {
-    Object.keys(result.recipe.products).forEach((product) => {});
-    Object.keys(result.recipe.materials).forEach((material) => {
+    if (result.targetMaterial != undefined) {
       let flatResult: FlatResultModel = {
         targetProduct: result.targetProduct,
-        targetMaterial: material,
-        yieldPerMin: calculateMaterialYPM(
-          result.targetProduct,
-          material,
-          result.recipe,
-          result.yieldPerMin,
-        ),
+        targetMaterial: result.targetMaterial,
+        yieldPerMin: result.yieldPerMin,
       };
-      productions.push(flatResult);
-    });
+      consumptions.push(flatResult);
+    } else {
+      Object.keys(result.recipe.materials).forEach((material) => {
+        let flatResult: FlatResultModel = {
+          targetProduct: result.targetProduct,
+          targetMaterial: material,
+          yieldPerMin: calculateMaterialYPM(
+            result.targetProduct,
+            material,
+            result.recipe,
+            result.yieldPerMin,
+          ),
+        };
+        productions.push(flatResult);
+      });
+    }
   });
-  return productions;
+  return [consumptions, productions];
+}
+
+export function getTargetItem(results: ResultModel[]) {
+  for (let result of results) {
+    if (result.targetMaterial == undefined) {
+      return result;
+    }
+  }
 }

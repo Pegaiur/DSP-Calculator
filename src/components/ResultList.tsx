@@ -1,6 +1,6 @@
 import React from 'react';
 import { RecipeModel } from '../recipes';
-import { ResultModel, calculateResults } from '../main';
+import { ResultModel, calculateResults, getTargetItem } from '../main';
 import { allItemNameArray } from '../items';
 import ResultListEntry from './ResultListEntry';
 
@@ -34,8 +34,8 @@ export default class ResultList extends React.Component<IProps, IState> {
       }
       resultArray.sort((aResults, bResults) => {
         return (
-          allItemNameArray.indexOf(aResults[0].targetProduct) -
-          allItemNameArray.indexOf(bResults[0].targetProduct)
+          allItemNameArray.indexOf(getTargetItem(aResults)!.targetProduct) -
+          allItemNameArray.indexOf(getTargetItem(bResults)!.targetProduct)
         );
       });
       return resultArray.map((result, index) => {

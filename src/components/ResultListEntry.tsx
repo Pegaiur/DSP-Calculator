@@ -1,4 +1,9 @@
-import { ResultModel, FlatResultModel, flattenResults } from '../main';
+import {
+  ResultModel,
+  FlatResultModel,
+  flattenResults,
+  getTargetItem,
+} from '../main';
 import React from 'react';
 import { RecipeModel } from '../recipes';
 
@@ -26,7 +31,9 @@ export default class ResultListEntry extends React.Component<IProps, IState> {
   render() {
     let totalYieldPerMin = 0;
     this.props.result.forEach((result) => {
-      totalYieldPerMin += result.yieldPerMin;
+      if (result.targetMaterial == undefined) {
+        totalYieldPerMin += result.yieldPerMin;
+      }
     });
 
     let button = (
@@ -35,16 +42,29 @@ export default class ResultListEntry extends React.Component<IProps, IState> {
       </button>
     );
 
-    let productionDetailResults: FlatResultModel[] = [];
-    if (this.state.isUnfolded) {
-      productionDetailResults = flattenResults(this.props.result);
-    }
+    let detailResults: FlatResultModel[][] = [];
+    // if (this.state.isUnfolded) {
+    detailResults = flattenResults(this.props.result);
+    // }
+    let consumptionDetailResults = detailResults[0];
+    let productionDetailResults = detailResults[1];
     return (
       <div>
         <div>
-          物品：{this.props.result[0].targetProduct} 产量：
-          {totalYieldPerMin.toFixed(1)}/分钟 {button}
+          物品：{getTargetItem(this.props.result)!.targetProduct} 产量：
+          {totalYieldPerMin.toFixed(1)}/分钟{' '}
+          {this.props.result[0].recipe.materials != {} ? button : null}
+          {/* TODO: hide detail for minerals */}
         </div>
+        {consumptionDetailResults.map((flatResult, index) => {
+          return (
+            <div key={index}>
+              {flatResult.targetMaterial} 制造 {flatResult.targetProduct} 消耗：
+              {flatResult.yieldPerMin.toFixed(1)}/分钟
+            </div>
+          );
+        })}
+        <div>——————————————————————————</div>
         {productionDetailResults.map((flatResult, index) => {
           return (
             <div key={index}>
