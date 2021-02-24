@@ -3,9 +3,9 @@ import styles from './index.less';
 import InputPanel from '../components/InputPanel';
 import ResultList from '../components/ResultList';
 import SumReportPanel from '../components/SumReport';
-import { ResultModel } from '../main';
+import { PageHeader, Layout } from 'antd';
 
-import { render } from 'react-dom';
+const { Header, Content, Footer, Sider } = Layout;
 
 interface IProps {}
 
@@ -43,15 +43,18 @@ export default class IndexPage extends React.Component<IProps, IState> {
       );
     }
     return (
-      <div>
-        <h1>戴森球计划产量计算</h1>
-        <InputPanel calculate={this.calculate} />
-        <ResultList
-          targetItem={this.state.targetItem}
-          expectedYieldPerMin={this.state.expectedYieldPerMin}
-        />
-        {sumPanel}
-      </div>
+      <Layout>
+        <PageHeader title="戴森球计划产量计算" subTitle="v0.0.1" />
+        <Content>
+          <InputPanel calculate={this.calculate} />
+          <ResultList
+            targetItem={this.state.targetItem}
+            expectedYieldPerMin={this.state.expectedYieldPerMin}
+          />
+          {sumPanel}
+        </Content>
+        <Footer>footer</Footer>
+      </Layout>
     );
   }
 }

@@ -1,13 +1,22 @@
-import { RecipeModel, calculateMaterialYPM, getRecipe } from './recipes';
+import {
+  RecipeModel,
+  calculateMaterialYPM,
+  isMineralRecipe,
+  getRecipe,
+} from './recipes';
 import { allItemNameArray } from './items';
-import ResultList from './components/ResultList';
-// import { minerals } from './minerals';
 
-export interface ResultModel {
+interface ProductionModel {
   targetProduct: string;
-  targetMaterial?: string;
   recipe: RecipeModel;
   yieldPerMin: number;
+}
+
+export interface ResultModel {
+  item: string;
+  currentRecipe: RecipeModel;
+  totalYieldPerMin: number;
+  consumptionDetail: { [item: string]: number };
 }
 
 export interface FlatResultModel {
@@ -16,123 +25,125 @@ export interface FlatResultModel {
   yieldPerMin: number;
 }
 
-export function calculateResults(item: string, expectedYieldPerMin: number) {
-  let results: { [item: string]: ResultModel[] } = {};
-  // TODO: selectable recipe
-  let recipe = getRecipe(item)[0];
-  addResult(results, item, recipe, expectedYieldPerMin);
-  if (recipe.materials != {}) {
+function calculateProductions(
+  targetProduct: string,
+  expectedYieldPerMin: number,
+) {
+  let productions: ProductionModel[] = [];
+  let recipe = getRecipe(targetProduct)[0];
+  addProduction(productions, targetProduct, recipe, expectedYieldPerMin);
+  if (isMineralRecipe(recipe) == false) {
     for (let material in recipe.materials) {
       const materialExpectedYieldPerMin = calculateMaterialYPM(
-        item,
+        targetProduct,
         material,
         recipe,
         expectedYieldPerMin,
       );
-      addResult(results, material, recipe, materialExpectedYieldPerMin, item); // result for item consumption detail
-      const subResults = calculateResults(
+      const subProductions = calculateProductions(
         material,
         materialExpectedYieldPerMin,
       );
-      mergeResults(results, subResults);
+      productions = productions.concat(subProductions);
     }
   }
-  return results;
+  return productions;
 }
 
-function addResult(
-  results: { [item: string]: ResultModel[] },
-  item: string,
+function addProduction(
+  productions: ProductionModel[],
+  targetProduct: string,
   recipe: RecipeModel,
   expectedYieldPerMin: number,
-  targetProduct?: string, // information for item consumption detail
 ) {
-  let resultAdded = false;
-  if (results[item] != undefined) {
-    // in case of hydrogen production
-    results[item].forEach((result) => {
-      if (result.recipe == recipe) {
-        result.yieldPerMin += expectedYieldPerMin;
-        resultAdded = true;
-      }
-    });
-  }
-  if (resultAdded == false) {
-    let result: ResultModel = {
-      targetProduct: item,
-      recipe: recipe,
-      yieldPerMin: expectedYieldPerMin,
-    };
-    if (targetProduct != undefined) {
-      result = {
-        targetProduct: targetProduct,
-        targetMaterial: item,
-        recipe: recipe,
-        yieldPerMin: expectedYieldPerMin,
-      };
-    }
-    if (results[item] == undefined) {
-      results[item] = [];
-    }
-    results[item].push(result);
-  }
+  const production: ProductionModel = {
+    targetProduct: targetProduct,
+    recipe: recipe,
+    yieldPerMin: expectedYieldPerMin,
+  };
+  productions.push(production);
 }
 
-function mergeResults(
-  results: { [item: string]: ResultModel[] },
-  resultsToMerge: { [item: string]: ResultModel[] },
-) {
-  for (let item in resultsToMerge) {
-    resultsToMerge[item].forEach((result) => {
-      if (result.targetMaterial != undefined) {
-        addResult(
-          results,
-          result.targetMaterial,
-          result.recipe,
-          result.yieldPerMin,
-          result.targetProduct,
-        );
-      } else {
-        addResult(results, item, result.recipe, result.yieldPerMin);
-      }
-    });
-  }
-}
-
-export function flattenResults(results: ResultModel[]) {
-  let productions: FlatResultModel[] = [];
-  let consumptions: FlatResultModel[] = [];
-  results.forEach((result) => {
-    if (result.targetMaterial != undefined) {
-      let flatResult: FlatResultModel = {
-        targetProduct: result.targetProduct,
-        targetMaterial: result.targetMaterial,
-        yieldPerMin: result.yieldPerMin,
-      };
-      consumptions.push(flatResult);
-    } else {
-      Object.keys(result.recipe.materials).forEach((material) => {
-        let flatResult: FlatResultModel = {
-          targetProduct: result.targetProduct,
-          targetMaterial: material,
-          yieldPerMin: calculateMaterialYPM(
-            result.targetProduct,
-            material,
-            result.recipe,
-            result.yieldPerMin,
-          ),
-        };
-        productions.push(flatResult);
-      });
+export function calculate(targetProduct: string, expectedYieldPerMin: number) {
+  let productions = calculateProductions(targetProduct, expectedYieldPerMin);
+  let results: ResultModel[] = [];
+  let byproducts: { [item: string]: number } = {};
+  productions.forEach((production) => {
+    addResult(results, production);
+    if (Object.keys(production.recipe.products).length > 1) {
+      addByproduct(byproducts, production);
     }
   });
-  return [consumptions, productions];
+  productions.forEach((production) => {
+    if (isMineralRecipe(production.recipe) == false) {
+      addConsumption(results, production);
+    }
+  });
+  results.sort((aResult, bResult) => {
+    return (
+      allItemNameArray.indexOf(aResult.item) -
+      allItemNameArray.indexOf(bResult.item)
+    );
+  });
+  let returnValue: [{ [item: string]: number }, ResultModel[]] = [
+    byproducts,
+    results,
+  ];
+  return returnValue;
 }
 
-export function getTargetItem(results: ResultModel[]) {
+function addResult(results: ResultModel[], production: ProductionModel) {
+  let isResultAdded = false;
   for (let result of results) {
-    if (result.targetMaterial == undefined) {
-      return result;
+    if (result.item == production.targetProduct) {
+      result.totalYieldPerMin += production.yieldPerMin;
+      isResultAdded = true;
+      break;
+    }
+  }
+  if (isResultAdded == false) {
+    let result: ResultModel = {
+      item: production.targetProduct,
+      currentRecipe: production.recipe,
+      totalYieldPerMin: production.yieldPerMin,
+      consumptionDetail: {},
+    };
+    results.push(result);
+  }
+}
+
+function addConsumption(results: ResultModel[], production: ProductionModel) {
+  for (let material in production.recipe.materials) {
+    let consumptionPerMin =
+      (production.yieldPerMin /
+        production.recipe.products[production.targetProduct]) *
+      production.recipe.materials[material];
+    for (let result of results) {
+      if (result.item == material) {
+        if (result.consumptionDetail[production.targetProduct] == undefined) {
+          result.consumptionDetail[production.targetProduct] = 0;
+        }
+        result.consumptionDetail[production.targetProduct] += consumptionPerMin;
+        break;
+      }
+    }
+  }
+}
+
+function addByproduct(
+  byproducts: { [item: string]: number },
+  production: ProductionModel,
+) {
+  for (let product in production.recipe.products) {
+    if (product != production.targetProduct) {
+      let yieldPerMin =
+        (production.yieldPerMin /
+          production.recipe.products[production.targetProduct]) *
+        production.recipe.products[product];
+      if (byproducts[product] == undefined) {
+        byproducts[product] = 0;
+      }
+      byproducts[product] += yieldPerMin;
     }
   }
 }

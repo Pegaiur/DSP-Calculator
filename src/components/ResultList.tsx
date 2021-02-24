@@ -1,8 +1,37 @@
 import React from 'react';
 import { RecipeModel } from '../recipes';
-import { ResultModel, calculateResults, getTargetItem } from '../main';
-import { allItemNameArray } from '../items';
-import ResultListEntry from './ResultListEntry';
+import { ResultModel, calculate } from '../main';
+import ResultDetail from './ResultDetail';
+import { Table } from 'antd';
+import ResultRecipeEntry from './ResultRecipeEntry';
+import ResultBuilding from './ResultBuilding';
+
+const columns = [
+  { title: '物品', dataIndex: 'item', key: 'name' },
+  {
+    title: '产量(个/每分钟)',
+    dataIndex: 'totalYieldPerMin',
+    key: 'yieldPerMin',
+    render: (text: string, data: TableData) => (
+      <div>{data.totalYieldPerMin.toFixed(1)}</div>
+    ),
+  },
+  {
+    title: '设施数量',
+    dataIndex: 'building',
+    key: 'building',
+    render: (text: string, data: TableData) => <ResultBuilding data={data} />,
+  },
+  {
+    title: '配方',
+    dataIndex: 'recipe',
+    key: 'recipe',
+    render: (text: string, data: TableData) => (
+      <ResultRecipeEntry recipe={data.recipe} />
+    ),
+  },
+  // { title: '传送带', dataIndex: '', key: '' },
+];
 
 interface IProps {
   targetItem?: string;
@@ -11,6 +40,14 @@ interface IProps {
 
 interface IState {
   results: ResultModel[];
+}
+
+export interface TableData {
+  key: number;
+  item: string;
+  totalYieldPerMin: number;
+  recipe: RecipeModel;
+  consumptionDetail: { [item: string]: number };
 }
 
 export default class ResultList extends React.Component<IProps, IState> {
@@ -24,23 +61,36 @@ export default class ResultList extends React.Component<IProps, IState> {
 
   render() {
     if (this.props.targetItem != undefined) {
-      let results = calculateResults(
+      let results = calculate(
         this.props.targetItem,
         this.props.expectedYieldPerMin,
       );
-      let resultArray: ResultModel[][] = [];
-      for (let item in results) {
-        resultArray.push(results[item]);
-      }
-      resultArray.sort((aResults, bResults) => {
-        return (
-          allItemNameArray.indexOf(getTargetItem(aResults)!.targetProduct) -
-          allItemNameArray.indexOf(getTargetItem(bResults)!.targetProduct)
-        );
+      let datas = results[1].map((result, index) => {
+        let data: TableData = {
+          key: index,
+          item: result.item,
+          totalYieldPerMin: result.totalYieldPerMin,
+          recipe: result.currentRecipe,
+          consumptionDetail: result.consumptionDetail,
+        };
+        return data;
       });
-      return resultArray.map((result, index) => {
-        return <ResultListEntry result={result} key={index} />;
-      });
+
+      return (
+        <div>
+          <Table
+            pagination={false}
+            columns={columns}
+            expandable={{
+              expandedRowRender: (data) => <ResultDetail data={data} />,
+              rowExpandable: (data) =>
+                Object.keys(data.consumptionDetail).length > 0,
+            }}
+            dataSource={datas}
+          />
+          <span>{results[0] == {} ? '没有多余副产物' : 'test'}</span>
+        </div>
+      );
     }
     return <div>测试</div>;
   }

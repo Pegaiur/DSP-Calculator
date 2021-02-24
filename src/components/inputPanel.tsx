@@ -1,5 +1,6 @@
 import React from 'react';
 import ItemSelect from './ItemSelect';
+import { InputNumber } from 'antd';
 
 interface IProps {
   calculate(targetItem: string, expectedValue: number): void;
@@ -36,7 +37,9 @@ export default class InputPanel extends React.Component<IProps, IState> {
   }
 
   handleClick() {
-    this.props.calculate(this.state.targetItem, this.state.expectedValue);
+    if (this.state.expectedValue != 0) {
+      this.props.calculate(this.state.targetItem, this.state.expectedValue);
+    }
   }
 
   handleSelect(value: string) {
@@ -55,8 +58,10 @@ export default class InputPanel extends React.Component<IProps, IState> {
         <h2>目标物品</h2>
         <ItemSelect onChange={this.handleSelect} />
         <h2>期望产量：</h2>
-        <input
-          type="text"
+        <InputNumber
+          size="large"
+          min={1}
+          max={65535}
           value={this.state.expectedValue}
           onInput={this.handleInput}
         />

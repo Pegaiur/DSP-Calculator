@@ -1,6 +1,7 @@
-import { minerals } from './minerals';
+import { v4 as uuidv4 } from 'uuid';
 
 export interface RecipeModel {
+  recipeID?: string;
   products: { [name: string]: number };
   materials: { [name: string]: number };
   time: number;
@@ -9,25 +10,25 @@ export interface RecipeModel {
   miningMultiplier?: number;
 }
 
-enum ProcessBuilding {
-  bench = 0, //合成台
-  furnace, //电弧熔炉
-  plant, //化工厂
-  refinery, //原油精炼厂
-  fractionatingTower, //分馏塔
-  collider, //粒子对撞机
-  institute, //研究站
+export enum ProcessBuilding {
+  bench = '合成台',
+  furnace = '电弧熔炉',
+  plant = '化工厂',
+  refinery = '原油精炼厂',
+  fractionatingTower = '分馏塔',
+  collider = '粒子对撞机',
+  institute = '研究站',
 }
 
-enum MiningBuilding {
-  miner = 0,
-  pump,
-  oilWell,
-  gasGiantCollector,
-  rayReceiver,
+export enum MiningBuilding {
+  miner = '开采机',
+  pump = '水泵',
+  oilWell = '原油开采站',
+  gasGiantCollector = '气态行星开采平台',
+  rayReceiver = '射线接收站',
 }
 
-enum MiningBuildingMultiplier {
+export enum MiningBuildingMultiplier {
   miner = 30,
   pump = 50,
   oilWell = 1,
@@ -42,10 +43,22 @@ export function calculateMaterialYPM(
   expectedYieldPerMin: number,
 ) {
   const rate = 60 / recipe.time;
-  const yieldPerMin = rate * recipe.products[product];
+  const yieldPerMin = (60 / recipe.time) * recipe.products[product];
   return (
     (expectedYieldPerMin / yieldPerMin) * recipe.materials[material] * rate
   );
+}
+
+export function calculateYPM(targetProduct: string, recipe: RecipeModel) {
+  return (60 / recipe.time) * recipe.products[targetProduct];
+}
+
+export function calculateBuilding(
+  targetProduct: string,
+  recipe: RecipeModel,
+  expectedYieldPerMin: number,
+) {
+  return expectedYieldPerMin / calculateYPM(targetProduct, recipe);
 }
 
 export function getRecipe(item: string) {
@@ -56,55 +69,58 @@ export function getRecipe(item: string) {
     }
   });
   return availableRecipes;
-  // TODO: special recipe
+}
+
+export function isMineralRecipe(recipe: RecipeModel) {
+  return mineralRecipes.indexOf(recipe) == -1 ? false : true;
 }
 
 export const mineralRecipes: RecipeModel[] = [
   {
     products: { 铁矿: 1 },
-    materials: {},
+    materials: { 矿簇: 1 },
     time: 1,
     miningBuilding: MiningBuilding.miner,
     miningMultiplier: MiningBuildingMultiplier.miner,
   },
   {
     products: { 铜矿: 1 },
-    materials: {},
+    materials: { 矿簇: 1 },
     time: 1,
     miningBuilding: MiningBuilding.miner,
     miningMultiplier: MiningBuildingMultiplier.miner,
   },
   {
     products: { 石矿: 1 },
-    materials: {},
+    materials: { 矿簇: 1 },
     time: 1,
     miningBuilding: MiningBuilding.miner,
     miningMultiplier: MiningBuildingMultiplier.miner,
   },
   {
     products: { 煤矿: 1 },
-    materials: {},
+    materials: { 矿簇: 1 },
     time: 1,
     miningBuilding: MiningBuilding.miner,
     miningMultiplier: MiningBuildingMultiplier.miner,
   },
   {
     products: { 钛石: 1 },
-    materials: {},
+    materials: { 矿簇: 1 },
     time: 1,
     miningBuilding: MiningBuilding.miner,
     miningMultiplier: MiningBuildingMultiplier.miner,
   },
   {
     products: { 水: 1 },
-    materials: {},
+    materials: { 矿簇: 1 },
     time: 1,
     miningBuilding: MiningBuilding.pump,
     miningMultiplier: MiningBuildingMultiplier.pump,
   },
   {
     products: { 原油: 1 },
-    materials: {},
+    materials: { 原油: 1 },
     time: 1,
     miningBuilding: MiningBuilding.oilWell,
     miningMultiplier: MiningBuildingMultiplier.oilWell,
@@ -117,7 +133,7 @@ export const specialRecipes: RecipeModel[] = [
     products: { 晶格硅: 1 },
     materials: { 分型硅石: 1 },
     time: 4,
-    processBuilding: ProcessBuilding.refinery,
+    processBuilding: ProcessBuilding.bench,
   },
   {
     products: { 金刚石: 1 },
@@ -214,12 +230,12 @@ let recipes: RecipeModel[] = [
     time: 4,
     processBuilding: ProcessBuilding.refinery,
   },
-  {
-    products: { 高能石墨: 1, 氢: 3 },
-    materials: { 原油: 1, 氢: 2 },
-    time: 4,
-    processBuilding: ProcessBuilding.refinery,
-  },
+  // {
+  //   products: { 高能石墨: 1, 氢: 3 },
+  //   materials: { 原油: 1, 氢: 2 },
+  //   time: 4,
+  //   processBuilding: ProcessBuilding.refinery,
+  // },
   {
     products: { 硅石: 1 },
     materials: { 石矿: 10 },
@@ -594,4 +610,11 @@ export const buildingRecipes: RecipeModel[] = [
   },
 ];
 
-recipes = recipes.concat(mineralRecipes).concat(buildingRecipes);
+recipes = mineralRecipes
+  .concat(mineralRecipes)
+  .concat(recipes)
+  .concat(buildingRecipes);
+
+recipes.forEach((recipe) => {
+  recipe.recipeID = uuidv4();
+});

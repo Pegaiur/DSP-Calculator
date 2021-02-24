@@ -20,9 +20,10 @@
     ]
   },
   "dependencies": {
-    "@ant-design/pro-layout": "^6.5.0",
     "@umijs/preset-react": "1.x",
-    "umi": "^3.3.7"
+    "antd": "^4.0.0",
+    "umi": "^3.3.7",
+    "uuid": "^8.3.2"
   },
   "devDependencies": {
     "@types/react": "^16.9.0",
