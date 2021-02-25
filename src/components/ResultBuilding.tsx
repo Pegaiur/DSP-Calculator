@@ -50,7 +50,10 @@ export default class ResultBuilding extends React.Component<IProps, IState> {
         this.props.data.totalYieldPerMin /
         this.props.data.recipe.miningMultiplier!
       ).toFixed(1);
-      if (this.props.data.recipe.miningBuilding != MiningBuilding.miner) {
+      if (
+        this.props.data.recipe.miningBuilding != MiningBuilding.miner &&
+        this.props.data.recipe.miningBuilding != MiningBuilding.oilWell
+      ) {
         buildingString = `${this.props.data.recipe.miningBuilding} x${buildingCount}`;
         buildingImageString = this.props.data.recipe.miningBuilding;
       } else {

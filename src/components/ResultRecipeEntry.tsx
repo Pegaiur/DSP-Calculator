@@ -8,7 +8,7 @@ import itemImagesJSON from '../icon-index.json';
 const itemImages: { [item: string]: string } = itemImagesJSON.data;
 
 interface IProps {
-  recipe: RecipeModel;
+  items: { [item: string]: number };
 }
 
 interface IState {}
@@ -23,9 +23,9 @@ export default class ResultRecipeEntry extends React.Component<IProps, IState> {
   render() {
     return (
       <Row justify="start">
-        {Object.keys(this.props.recipe.materials).map((material, index) => {
+        {Object.keys(this.props.items).map((item, index) => {
           return (
-            <Col span={2} key={index}>
+            <Col span={3} key={index}>
               <Avatar
                 shape="square"
                 size={40}
@@ -33,34 +33,13 @@ export default class ResultRecipeEntry extends React.Component<IProps, IState> {
                   <img
                     id={styles.itemImage}
                     src={
-                      itemImages[material] +
+                      itemImages[item] +
                       '?x-oss-process=image/resize,l_40,m_lfit'
                     }
                   />
                 }
               />
-              x{this.props.recipe.materials[material]}
-            </Col>
-          );
-        })}
-        <Col span={2}>-{this.props.recipe.time}秒-</Col>
-        {Object.keys(this.props.recipe.products).map((product, index) => {
-          return (
-            <Col span={2} key={index}>
-              <Avatar
-                shape="square"
-                size={40}
-                src={
-                  <img
-                    id={styles.itemImage}
-                    src={
-                      itemImages[product] +
-                      '?x-oss-process=image/resize,l_40,m_lfit'
-                    }
-                  />
-                }
-              />
-              x{this.props.recipe.products[product]}
+              x{this.props.items[item]}
             </Col>
           );
         })}

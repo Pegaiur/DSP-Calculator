@@ -53,9 +53,32 @@ const columns = [
     title: '配方',
     dataIndex: 'recipe',
     key: 'recipe',
-    render: (text: string, data: TableData) => (
-      <ResultRecipeEntry recipe={data.recipe} />
-    ),
+    children: [
+      {
+        title: '原材料',
+        dataIndex: '',
+        key: '',
+        render: (text: string, data: TableData) => (
+          <ResultRecipeEntry items={data.recipe.materials} />
+        ),
+      },
+      {
+        title: '耗时',
+        dataIndex: '',
+        key: '',
+        render: (text: string, data: TableData) => (
+          <div>{data.recipe.time}秒</div>
+        ),
+      },
+      {
+        title: '产物',
+        dataIndex: '',
+        key: '',
+        render: (text: string, data: TableData) => (
+          <ResultRecipeEntry items={data.recipe.products} />
+        ),
+      },
+    ],
   },
   // { title: '传送带', dataIndex: '', key: '' },
 ];
@@ -106,6 +129,7 @@ export default class ResultList extends React.Component<IProps, IState> {
       return (
         <div>
           <Table
+            bordered={true}
             pagination={false}
             columns={columns}
             expandable={{

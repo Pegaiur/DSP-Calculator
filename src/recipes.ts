@@ -125,6 +125,63 @@ export const mineralRecipes: RecipeModel[] = [
     miningBuilding: MiningBuilding.oilWell,
     miningMultiplier: MiningBuildingMultiplier.oilWell,
   },
+  {
+    products: { 临界光子: 1 },
+    materials: { 戴森球: 1 },
+    time: 1,
+    miningBuilding: MiningBuilding.rayReceiver,
+    miningMultiplier: MiningBuildingMultiplier.rayReceiver,
+  },
+  // rare mineral
+  {
+    products: { 分型硅石: 1 },
+    materials: { 分型硅矿: 1 },
+    time: 1,
+    miningBuilding: MiningBuilding.miner,
+    miningMultiplier: MiningBuildingMultiplier.miner,
+  },
+  {
+    products: { 金伯利矿石: 1 },
+    materials: { 金伯利矿: 1 },
+    time: 1,
+    miningBuilding: MiningBuilding.miner,
+    miningMultiplier: MiningBuildingMultiplier.miner,
+  },
+  {
+    products: { 光栅石: 1 },
+    materials: { 光栅石矿: 1 },
+    time: 1,
+    miningBuilding: MiningBuilding.miner,
+    miningMultiplier: MiningBuildingMultiplier.miner,
+  },
+  {
+    products: { 可燃冰: 1 },
+    materials: { 可燃冰矿: 1 },
+    time: 1,
+    miningBuilding: MiningBuilding.miner,
+    miningMultiplier: MiningBuildingMultiplier.miner,
+  },
+  {
+    products: { 刺笋结晶: 1 },
+    materials: { 刺笋矿脉: 1 },
+    time: 1,
+    miningBuilding: MiningBuilding.miner,
+    miningMultiplier: MiningBuildingMultiplier.miner,
+  },
+  {
+    products: { 有机晶体: 1 },
+    materials: { 有机晶体矿: 1 },
+    time: 1,
+    miningBuilding: MiningBuilding.miner,
+    miningMultiplier: MiningBuildingMultiplier.miner,
+  },
+  {
+    products: { 单极磁石: 1 },
+    materials: { 单极磁矿: 1 },
+    time: 1,
+    miningBuilding: MiningBuilding.miner,
+    miningMultiplier: MiningBuildingMultiplier.miner,
+  },
 ];
 
 // high efficiency recipes
@@ -242,12 +299,12 @@ let recipes: RecipeModel[] = [
     time: 10,
     processBuilding: ProcessBuilding.refinery,
   },
-  {
-    products: { 重氢: 1 },
-    materials: { 氢: 1 },
-    time: 0, //根据传送带速度决定
-    processBuilding: ProcessBuilding.fractionatingTower,
-  },
+  // {
+  //   products: { 重氢: 1 },
+  //   materials: { 氢: 1 },
+  //   time: 0, //根据传送带速度决定
+  //   processBuilding: ProcessBuilding.fractionatingTower,
+  // },
   {
     products: { 重氢: 5 },
     materials: { 氢: 10 },
