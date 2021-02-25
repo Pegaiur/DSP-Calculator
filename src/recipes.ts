@@ -11,20 +11,20 @@ export interface RecipeModel {
 }
 
 export enum ProcessBuilding {
-  bench = '合成台',
+  bench = '制造台',
   furnace = '电弧熔炉',
   plant = '化工厂',
   refinery = '原油精炼厂',
   fractionatingTower = '分馏塔',
-  collider = '粒子对撞机',
-  institute = '研究站',
+  collider = '微型粒子对撞机',
+  institute = '矩阵研究站',
 }
 
 export enum MiningBuilding {
-  miner = '开采机',
-  pump = '水泵',
-  oilWell = '原油开采站',
-  gasGiantCollector = '气态行星开采平台',
+  miner = '采矿机',
+  pump = '抽水站',
+  oilWell = '原油萃取站',
+  gasGiantCollector = '轨道采集器',
   rayReceiver = '射线接收站',
 }
 
@@ -78,49 +78,49 @@ export function isMineralRecipe(recipe: RecipeModel) {
 export const mineralRecipes: RecipeModel[] = [
   {
     products: { 铁矿: 1 },
-    materials: { 矿簇: 1 },
+    materials: { 铁矿脉: 1 },
     time: 1,
     miningBuilding: MiningBuilding.miner,
     miningMultiplier: MiningBuildingMultiplier.miner,
   },
   {
     products: { 铜矿: 1 },
-    materials: { 矿簇: 1 },
+    materials: { 铜矿脉: 1 },
     time: 1,
     miningBuilding: MiningBuilding.miner,
     miningMultiplier: MiningBuildingMultiplier.miner,
   },
   {
     products: { 石矿: 1 },
-    materials: { 矿簇: 1 },
+    materials: { 石矿脉: 1 },
     time: 1,
     miningBuilding: MiningBuilding.miner,
     miningMultiplier: MiningBuildingMultiplier.miner,
   },
   {
     products: { 煤矿: 1 },
-    materials: { 矿簇: 1 },
+    materials: { 煤矿脉: 1 },
     time: 1,
     miningBuilding: MiningBuilding.miner,
     miningMultiplier: MiningBuildingMultiplier.miner,
   },
   {
     products: { 钛石: 1 },
-    materials: { 矿簇: 1 },
+    materials: { 钛矿脉: 1 },
     time: 1,
     miningBuilding: MiningBuilding.miner,
     miningMultiplier: MiningBuildingMultiplier.miner,
   },
   {
     products: { 水: 1 },
-    materials: { 矿簇: 1 },
+    materials: { 海洋: 1 },
     time: 1,
     miningBuilding: MiningBuilding.pump,
     miningMultiplier: MiningBuildingMultiplier.pump,
   },
   {
     products: { 原油: 1 },
-    materials: { 原油: 1 },
+    materials: { 原油涌泉: 1 },
     time: 1,
     miningBuilding: MiningBuilding.oilWell,
     miningMultiplier: MiningBuildingMultiplier.oilWell,

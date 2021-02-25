@@ -1,13 +1,40 @@
+import styles from './ItemImageAvatar.less';
+
 import React from 'react';
 import { RecipeModel } from '../recipes';
 import { ResultModel, calculate } from '../main';
 import ResultDetail from './ResultDetail';
-import { Table } from 'antd';
+import { Table, Avatar } from 'antd';
 import ResultRecipeEntry from './ResultRecipeEntry';
 import ResultBuilding from './ResultBuilding';
+import itemImagesJSON from '../icon-index.json';
+
+const itemImages: { [item: string]: string } = itemImagesJSON.data;
 
 const columns = [
-  { title: '物品', dataIndex: 'item', key: 'name' },
+  {
+    title: '物品',
+    dataIndex: 'item',
+    key: 'name',
+    render: (text: string, data: TableData) => (
+      <div>
+        <Avatar
+          shape="square"
+          size={40}
+          src={
+            <img
+              id={styles.itemImage}
+              src={
+                itemImages[data.item] +
+                '?x-oss-process=image/resize,l_40,m_lfit'
+              }
+            />
+          }
+        />
+        {data.item}
+      </div>
+    ),
+  },
   {
     title: '产量(个/每分钟)',
     dataIndex: 'totalYieldPerMin',

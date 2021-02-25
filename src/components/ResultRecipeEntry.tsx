@@ -1,6 +1,11 @@
+import styles from './ItemImageAvatar.less';
+
 import { RecipeModel } from '@/recipes';
-import { Row, Col } from 'antd';
+import { Row, Col, Avatar } from 'antd';
 import React from 'react';
+import itemImagesJSON from '../icon-index.json';
+
+const itemImages: { [item: string]: string } = itemImagesJSON.data;
 
 interface IProps {
   recipe: RecipeModel;
@@ -21,15 +26,41 @@ export default class ResultRecipeEntry extends React.Component<IProps, IState> {
         {Object.keys(this.props.recipe.materials).map((material, index) => {
           return (
             <Col span={2} key={index}>
-              {material} x {this.props.recipe.materials[material]}
+              <Avatar
+                shape="square"
+                size={40}
+                src={
+                  <img
+                    id={styles.itemImage}
+                    src={
+                      itemImages[material] +
+                      '?x-oss-process=image/resize,l_40,m_lfit'
+                    }
+                  />
+                }
+              />
+              x{this.props.recipe.materials[material]}
             </Col>
           );
         })}
-        <Col span={2}>--{this.props.recipe.time}秒--</Col>
+        <Col span={2}>-{this.props.recipe.time}秒-</Col>
         {Object.keys(this.props.recipe.products).map((product, index) => {
           return (
             <Col span={2} key={index}>
-              {product} x {this.props.recipe.products[product]}
+              <Avatar
+                shape="square"
+                size={40}
+                src={
+                  <img
+                    id={styles.itemImage}
+                    src={
+                      itemImages[product] +
+                      '?x-oss-process=image/resize,l_40,m_lfit'
+                    }
+                  />
+                }
+              />
+              x{this.props.recipe.products[product]}
             </Col>
           );
         })}
