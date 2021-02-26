@@ -367,12 +367,6 @@ let recipes: RecipeModel[] = [
     processBuilding: ProcessBuilding.bench,
   },
   {
-    products: { 微晶元件: 1 },
-    materials: { 铜块: 1, 高纯硅块: 2 },
-    time: 2,
-    processBuilding: ProcessBuilding.bench,
-  },
-  {
     products: { 硫酸: 4 },
     materials: { 精炼油: 6, 石矿: 8, 水: 4 },
     time: 6,
@@ -527,7 +521,7 @@ let recipes: RecipeModel[] = [
   },
   {
     products: { 框架材料: 1 },
-    materials: { 碳纳米管: 2, 钛合金: 1, 石高纯硅块: 1 },
+    materials: { 碳纳米管: 2, 钛合金: 1, 高纯硅块: 1 },
     time: 6,
     processBuilding: ProcessBuilding.bench,
   },
@@ -668,7 +662,7 @@ export const buildingRecipes: RecipeModel[] = [
 ];
 
 recipes = mineralRecipes
-  .concat(mineralRecipes)
+  .concat(specialRecipes)
   .concat(recipes)
   .concat(buildingRecipes);
 

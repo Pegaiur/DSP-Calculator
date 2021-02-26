@@ -1,12 +1,8 @@
-import styles from './ItemImageAvatar.less';
-
 import React from 'react';
 import { TableData } from './ResultList';
 import { Radio, RadioChangeEvent, Avatar } from 'antd';
 import { MiningBuilding, calculateBuilding, ProcessBuilding } from '../recipes';
-import itemImagesJSON from '../icon-index.json';
-
-const itemImages: { [item: string]: string } = itemImagesJSON.data;
+import ItemImageAvatar from './ItemImageAvatar';
 
 interface IProps {
   data: TableData;
@@ -54,12 +50,10 @@ export default class ResultBuilding extends React.Component<IProps, IState> {
         this.props.data.recipe.miningBuilding != MiningBuilding.miner &&
         this.props.data.recipe.miningBuilding != MiningBuilding.oilWell
       ) {
-        buildingString = `${this.props.data.recipe.miningBuilding} x${buildingCount}`;
+        buildingString = ` x${buildingCount}`;
         buildingImageString = this.props.data.recipe.miningBuilding;
       } else {
-        buildingString = `${
-          Object.keys(this.props.data.recipe.materials)[0]
-        } x${buildingCount}`;
+        buildingString = ` x${buildingCount}`;
         buildingImageString = Object.keys(this.props.data.recipe.materials)[0];
       }
     }
@@ -73,26 +67,16 @@ export default class ResultBuilding extends React.Component<IProps, IState> {
         this.props.data.recipe,
         this.props.data.totalYieldPerMin,
       ).toFixed(1);
-      buildingString = `${this.props.data.recipe.processBuilding} x${buildingCount}个`;
+      buildingString = ` x${buildingCount}`;
       buildingImageString = this.props.data.recipe.processBuilding;
     }
 
     let benchRadioGroup = (
       <div>
-        <Avatar
-          shape="square"
-          size={40}
-          src={
-            <img
-              id={styles.itemImage}
-              src={
-                itemImages[`制造台${this.state.benchType}`] +
-                '?x-oss-process=image/resize,l_40,m_lfit'
-              }
-            />
-          }
+        <ItemImageAvatar
+          item={`制造台${this.state.benchType}`}
+          showName={true}
         />
-        制造台
         <Radio.Group
           value={this.state.benchType}
           onChange={this.handleBenchChange}
@@ -115,19 +99,7 @@ export default class ResultBuilding extends React.Component<IProps, IState> {
       <div>
         {this.props.data.recipe.processBuilding ==
         ProcessBuilding.bench ? null : (
-          <Avatar
-            shape="square"
-            size={40}
-            src={
-              <img
-                id={styles.itemImage}
-                src={
-                  itemImages[buildingImageString] +
-                  '?x-oss-process=image/resize,l_40,m_lfit'
-                }
-              />
-            }
-          />
+          <ItemImageAvatar item={buildingImageString} showName={true} />
         )}
         {buildingString}
         {this.props.data.recipe.processBuilding == ProcessBuilding.bench

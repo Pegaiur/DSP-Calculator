@@ -3,6 +3,7 @@ import {
   calculateMaterialYPM,
   isMineralRecipe,
   getRecipe,
+  specialRecipes,
 } from './recipes';
 import { allItemNameArray } from './items';
 
@@ -28,9 +29,18 @@ export interface FlatResultModel {
 function calculateProductions(
   targetProduct: string,
   expectedYieldPerMin: number,
+  specifiedRecipes: RecipeModel[],
 ) {
   let productions: ProductionModel[] = [];
-  let recipe = getRecipe(targetProduct)[0];
+  let availableRecipes = getRecipe(targetProduct);
+  let recipe = availableRecipes[0];
+  specifiedRecipes.forEach((specifiedRecipe) => {
+    availableRecipes.forEach((availableRecipe) => {
+      if (specifiedRecipe.recipeID == availableRecipe.recipeID) {
+        recipe = specifiedRecipe;
+      }
+    });
+  });
   addProduction(productions, targetProduct, recipe, expectedYieldPerMin);
   if (isMineralRecipe(recipe) == false) {
     for (let material in recipe.materials) {
@@ -43,6 +53,7 @@ function calculateProductions(
       const subProductions = calculateProductions(
         material,
         materialExpectedYieldPerMin,
+        specifiedRecipes,
       );
       productions = productions.concat(subProductions);
     }
@@ -64,8 +75,17 @@ function addProduction(
   productions.push(production);
 }
 
-export function calculate(targetProduct: string, expectedYieldPerMin: number) {
-  let productions = calculateProductions(targetProduct, expectedYieldPerMin);
+export function calculate(
+  targetProduct: string,
+  expectedYieldPerMin: number,
+  specifiedRecipes: RecipeModel[],
+) {
+  console.log(specifiedRecipes);
+  let productions = calculateProductions(
+    targetProduct,
+    expectedYieldPerMin,
+    specifiedRecipes,
+  );
   let results: ResultModel[] = [];
   let byproducts: { [item: string]: number } = {};
   productions.forEach((production) => {

@@ -1,96 +1,19 @@
-import styles from './ItemImageAvatar.less';
-
 import React from 'react';
-import { RecipeModel } from '../recipes';
-import { ResultModel, calculate } from '../main';
+import { getRecipe, RecipeModel } from '../recipes';
+import { ResultModel } from '../main';
 import ResultDetail from './ResultDetail';
-import { Table, Avatar } from 'antd';
-import ResultRecipeEntry from './ResultRecipeEntry';
+import { Table } from 'antd';
+import RecipeEntry from './RecipeEntry';
 import ResultBuilding from './ResultBuilding';
-import itemImagesJSON from '../icon-index.json';
-
-const itemImages: { [item: string]: string } = itemImagesJSON.data;
-
-const columns = [
-  {
-    title: '物品',
-    dataIndex: 'item',
-    key: 'name',
-    render: (text: string, data: TableData) => (
-      <div>
-        <Avatar
-          shape="square"
-          size={40}
-          src={
-            <img
-              id={styles.itemImage}
-              src={
-                itemImages[data.item] +
-                '?x-oss-process=image/resize,l_40,m_lfit'
-              }
-            />
-          }
-        />
-        {data.item}
-      </div>
-    ),
-  },
-  {
-    title: '产量(个/每分钟)',
-    dataIndex: 'totalYieldPerMin',
-    key: 'yieldPerMin',
-    render: (text: string, data: TableData) => (
-      <div>{data.totalYieldPerMin.toFixed(1)}</div>
-    ),
-  },
-  {
-    title: '设施数量',
-    dataIndex: 'building',
-    key: 'building',
-    render: (text: string, data: TableData) => <ResultBuilding data={data} />,
-  },
-  {
-    title: '配方',
-    dataIndex: 'recipe',
-    key: 'recipe',
-    children: [
-      {
-        title: '原材料',
-        dataIndex: '',
-        key: '',
-        render: (text: string, data: TableData) => (
-          <ResultRecipeEntry items={data.recipe.materials} />
-        ),
-      },
-      {
-        title: '耗时',
-        dataIndex: '',
-        key: '',
-        render: (text: string, data: TableData) => (
-          <div>{data.recipe.time}秒</div>
-        ),
-      },
-      {
-        title: '产物',
-        dataIndex: '',
-        key: '',
-        render: (text: string, data: TableData) => (
-          <ResultRecipeEntry items={data.recipe.products} />
-        ),
-      },
-    ],
-  },
-  // { title: '传送带', dataIndex: '', key: '' },
-];
+import ItemImageAvatar from './ItemImageAvatar';
 
 interface IProps {
   targetItem?: string;
-  expectedYieldPerMin: number;
-}
-
-interface IState {
+  onChangeRecipe(item: string, currentRecipe: RecipeModel): void;
   results: ResultModel[];
 }
+
+interface IState {}
 
 export interface TableData {
   key: number;
@@ -104,18 +27,70 @@ export default class ResultList extends React.Component<IProps, IState> {
   constructor(props: IProps, state: IState) {
     super(props, state);
 
-    this.state = { results: [] };
+    this.onChangeRecipe = this.onChangeRecipe.bind(this);
+
+    this.state = {
+      results: [],
+    };
   }
 
-  switchRecipe(item: string, recipe: RecipeModel) {}
+  columns = [
+    {
+      title: '物品',
+      dataIndex: 'item',
+      key: 'name',
+      render: (text: string, data: TableData) => (
+        <div>
+          <ItemImageAvatar item={data.item} showName={true} />
+        </div>
+      ),
+    },
+    {
+      title: '产量(个/每分钟)',
+      dataIndex: 'totalYieldPerMin',
+      key: 'yieldPerMin',
+      width: 140,
+      render: (text: string, data: TableData) => (
+        <div>{data.totalYieldPerMin.toFixed(1)}</div>
+      ),
+    },
+    {
+      title: '设施数量',
+      dataIndex: 'building',
+      key: 'building',
+      width: 400,
+      render: (text: string, data: TableData) => <ResultBuilding data={data} />,
+    },
+    {
+      title: '配方',
+      dataIndex: 'recipe',
+      key: 'recipe',
+      render: (text: string, data: TableData) => (
+        <RecipeEntry
+          recipe={data.recipe}
+          selected={false}
+          onSelect={() => {}}
+        />
+      ),
+    },
+    // { title: '传送带', dataIndex: '', key: '' },
+    {
+      title: '操作',
+      key: 'action',
+      render: (text: string, data: TableData) =>
+        getRecipe(data.item).length > 1 ? (
+          <a onClick={() => this.onChangeRecipe(data)}>更改配方</a>
+        ) : null,
+    },
+  ];
+
+  onChangeRecipe(data: TableData) {
+    this.props.onChangeRecipe(data.item, data.recipe);
+  }
 
   render() {
     if (this.props.targetItem != undefined) {
-      let results = calculate(
-        this.props.targetItem,
-        this.props.expectedYieldPerMin,
-      );
-      let datas = results[1].map((result, index) => {
+      let datas = this.props.results.map((result, index) => {
         let data: TableData = {
           key: index,
           item: result.item,
@@ -129,9 +104,9 @@ export default class ResultList extends React.Component<IProps, IState> {
       return (
         <div>
           <Table
-            bordered={true}
+            // bordered={true}
             pagination={false}
-            columns={columns}
+            columns={this.columns}
             expandable={{
               expandedRowRender: (data) => <ResultDetail data={data} />,
               rowExpandable: (data) =>
@@ -139,7 +114,6 @@ export default class ResultList extends React.Component<IProps, IState> {
             }}
             dataSource={datas}
           />
-          <span>{results[0] == {} ? '没有多余副产物' : 'test'}</span>
         </div>
       );
     }
