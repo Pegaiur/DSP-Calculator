@@ -28,8 +28,8 @@ export default class InputPanel extends React.Component<IProps, IState> {
     };
   }
 
-  handleInput(event: React.FormEvent<HTMLInputElement>) {
-    const inputValue = parseInt(event.currentTarget.value);
+  handleInput(value: React.ReactText) {
+    const inputValue = parseInt(`${value}`);
     if (isNaN(inputValue)) {
       this.setState({ expectedValue: 0, warning: true });
     } else {
@@ -64,7 +64,7 @@ export default class InputPanel extends React.Component<IProps, IState> {
           min={1}
           max={65535}
           value={this.state.expectedValue}
-          onInput={this.handleInput}
+          onChange={this.handleInput}
         />
         {warningLabel}
         <br />

@@ -160,6 +160,7 @@ export default class IndexPage extends React.Component<IProps, IState> {
               type="primary"
               shape="round"
               size="large"
+              key="faq"
               icon={<QuestionCircleOutlined />}
               onClick={() =>
                 Modal.info({
