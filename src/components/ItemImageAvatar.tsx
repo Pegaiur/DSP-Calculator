@@ -1,6 +1,6 @@
 import styles from './ItemImageAvatar.less';
 
-import { Avatar, Row } from 'antd';
+import { Avatar, Space } from 'antd';
 import React from 'react';
 import itemImagesJSON from '../icon-index.json';
 
@@ -30,25 +30,27 @@ export default class ItemImageAvatar extends React.Component<IProps, IState> {
 
   render() {
     return (
-      <Row align="middle">
-        <Avatar
-          shape="square"
-          size={this.props.size}
-          src={
-            <img
-              id={styles.itemImage}
-              src={
-                itemImages[this.props.item] +
-                `?x-oss-process=image/resize,l_${this.props.size},m_lfit`
-              }
-            />
-          }
-        />
-        {this.props.badgeNumber > 0 ? (
-          <sub>{this.props.badgeNumber}</sub>
-        ) : null}
+      <Space align="center">
+        <div>
+          <Avatar
+            shape="square"
+            size={this.props.size}
+            src={
+              <img
+                id={styles.itemImage}
+                src={
+                  itemImages[this.props.item] +
+                  `?x-oss-process=image/resize,l_${this.props.size},m_lfit`
+                }
+              />
+            }
+          />
+          {this.props.badgeNumber > 0 ? (
+            <sub>{this.props.badgeNumber}</sub>
+          ) : null}
+        </div>
         {this.props.showName ? <span>{this.props.item}</span> : null}
-      </Row>
+      </Space>
     );
   }
 }

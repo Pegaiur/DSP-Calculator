@@ -1,4 +1,5 @@
 import React from 'react';
+import { Cascader } from 'antd';
 import { allItemNames } from '../items';
 
 interface IProps {
@@ -23,31 +24,29 @@ export default class ItemSelect extends React.Component<IProps, IState> {
   handleChange(event: React.ChangeEvent<HTMLSelectElement>) {
     this.setState({ targetItem: event.currentTarget.value }, () => {
       this.props.onChange(this.state.targetItem);
-      console.log(this.state.targetItem);
     });
   }
 
   render() {
+    let options = Object.keys(allItemNames).map((tier) => {
+      return {
+        value: tier,
+        label: tier,
+        children: allItemNames[tier].map((item) => {
+          return { value: item, label: item };
+        }),
+      };
+    });
     return (
-      <select
-        name={'目标物品'}
-        value={this.state.targetItem}
-        onChange={this.handleChange}
-      >
-        {Object.keys(allItemNames).map((tier, index) => {
-          return (
-            <optgroup label={tier} key={index}>
-              {allItemNames[tier].map((name, i) => {
-                return (
-                  <option value={name} key={i}>
-                    {name}
-                  </option>
-                );
-              })}
-            </optgroup>
-          );
-        })}
-      </select>
+      <Cascader
+        size="large"
+        placeholder="请选择目标产物"
+        defaultValue={['物品等级9', '宇宙矩阵']}
+        options={options}
+        onChange={(value, selectedOptions) =>
+          this.props.onChange(`${value[1]}`)
+        }
+      />
     );
   }
 }

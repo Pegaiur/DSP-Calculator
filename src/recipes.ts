@@ -8,6 +8,7 @@ export interface RecipeModel {
   processBuilding?: ProcessBuilding;
   miningBuilding?: MiningBuilding;
   miningMultiplier?: number;
+  equivalentRecipe?: RecipeModel;
 }
 
 export enum ProcessBuilding {
@@ -71,6 +72,14 @@ export function getRecipe(item: string) {
   return availableRecipes;
 }
 
+export function getOriginalRecipe(equivalentRecipe: RecipeModel) {
+  for (let recipe of recipes) {
+    if (recipe.equivalentRecipe == equivalentRecipe) {
+      return recipe;
+    }
+  }
+}
+
 export function isMineralRecipe(recipe: RecipeModel) {
   return mineralRecipes.indexOf(recipe) == -1 ? false : true;
 }
@@ -105,6 +114,13 @@ export const mineralRecipes: RecipeModel[] = [
     miningMultiplier: MiningBuildingMultiplier.miner,
   },
   {
+    products: { 硅石: 1 },
+    materials: { 硅矿脉: 1 },
+    time: 1,
+    miningBuilding: MiningBuilding.miner,
+    miningMultiplier: MiningBuildingMultiplier.miner,
+  },
+  {
     products: { 钛石: 1 },
     materials: { 钛矿脉: 1 },
     time: 1,
@@ -113,7 +129,14 @@ export const mineralRecipes: RecipeModel[] = [
   },
   {
     products: { 水: 1 },
-    materials: { 海洋: 1 },
+    materials: { 抽水站: 1 },
+    time: 1,
+    miningBuilding: MiningBuilding.pump,
+    miningMultiplier: MiningBuildingMultiplier.pump,
+  },
+  {
+    products: { 硫酸: 1 },
+    materials: { 抽水站: 1 },
     time: 1,
     miningBuilding: MiningBuilding.pump,
     miningMultiplier: MiningBuildingMultiplier.pump,
@@ -126,16 +149,30 @@ export const mineralRecipes: RecipeModel[] = [
     miningMultiplier: MiningBuildingMultiplier.oilWell,
   },
   {
+    products: { 氢: 1 },
+    materials: { 轨道采集器: 1 },
+    time: 1,
+    miningBuilding: MiningBuilding.gasGiantCollector,
+    miningMultiplier: MiningBuildingMultiplier.gasGiantCollector,
+  },
+  {
+    products: { 重氢: 1 },
+    materials: { 轨道采集器: 1 },
+    time: 1,
+    miningBuilding: MiningBuilding.gasGiantCollector,
+    miningMultiplier: MiningBuildingMultiplier.gasGiantCollector,
+  },
+  {
     products: { 临界光子: 1 },
-    materials: { 戴森球: 1 },
+    materials: { 射线接收站: 1 },
     time: 1,
     miningBuilding: MiningBuilding.rayReceiver,
     miningMultiplier: MiningBuildingMultiplier.rayReceiver,
   },
   // rare mineral
   {
-    products: { 分型硅石: 1 },
-    materials: { 分型硅矿: 1 },
+    products: { 分形硅石: 1 },
+    materials: { 分形硅矿: 1 },
     time: 1,
     miningBuilding: MiningBuilding.miner,
     miningMultiplier: MiningBuildingMultiplier.miner,
@@ -188,7 +225,7 @@ export const mineralRecipes: RecipeModel[] = [
 export const specialRecipes: RecipeModel[] = [
   {
     products: { 晶格硅: 1 },
-    materials: { 分型硅石: 1 },
+    materials: { 分形硅石: 1 },
     time: 4,
     processBuilding: ProcessBuilding.bench,
   },
@@ -287,24 +324,36 @@ let recipes: RecipeModel[] = [
     time: 4,
     processBuilding: ProcessBuilding.refinery,
   },
-  // {
-  //   products: { 高能石墨: 1, 氢: 3 },
-  //   materials: { 原油: 1, 氢: 2 },
-  //   time: 4,
-  //   processBuilding: ProcessBuilding.refinery,
-  // },
+  {
+    products: { 高能石墨: 1, 氢: 3 },
+    materials: { 精炼油: 1, 氢: 2 },
+    time: 4,
+    processBuilding: ProcessBuilding.refinery,
+    equivalentRecipe: {
+      products: { 高能石墨: 1, 氢: 1 },
+      materials: { 精炼油: 1 },
+      time: 4,
+      processBuilding: ProcessBuilding.refinery,
+    },
+  },
   {
     products: { 硅石: 1 },
     materials: { 石矿: 10 },
     time: 10,
-    processBuilding: ProcessBuilding.refinery,
+    processBuilding: ProcessBuilding.furnace,
   },
-  // {
-  //   products: { 重氢: 1 },
-  //   materials: { 氢: 1 },
-  //   time: 0, //根据传送带速度决定
-  //   processBuilding: ProcessBuilding.fractionatingTower,
-  // },
+  {
+    products: { 重氢: 0.01, 氢: 0.99 },
+    materials: { 氢: 1 },
+    time: 100,
+    processBuilding: ProcessBuilding.fractionatingTower,
+    equivalentRecipe: {
+      products: { 重氢: 3.6 },
+      materials: { 氢: 3.6 },
+      time: 60, //普通传送带速度，高速传送带产量*2，极速传送带产量*5
+      processBuilding: ProcessBuilding.fractionatingTower,
+    },
+  },
   {
     products: { 重氢: 5 },
     materials: { 氢: 10 },

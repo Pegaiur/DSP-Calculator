@@ -29,18 +29,21 @@ export interface FlatResultModel {
 function calculateProductions(
   targetProduct: string,
   expectedYieldPerMin: number,
-  specifiedRecipes: RecipeModel[],
+  specifiedRecipes: { [item: string]: RecipeModel },
+  // byproducts: { [item: string]: number } = {}
 ) {
   let productions: ProductionModel[] = [];
+  // if (byproducts[targetProduct] != undefined) {
+
+  // }
   let availableRecipes = getRecipe(targetProduct);
   let recipe = availableRecipes[0];
-  specifiedRecipes.forEach((specifiedRecipe) => {
-    availableRecipes.forEach((availableRecipe) => {
-      if (specifiedRecipe.recipeID == availableRecipe.recipeID) {
-        recipe = specifiedRecipe;
-      }
-    });
-  });
+  if (specifiedRecipes[targetProduct] != undefined) {
+    recipe = specifiedRecipes[targetProduct];
+  }
+  if (recipe.equivalentRecipe != undefined) {
+    recipe = recipe.equivalentRecipe;
+  }
   addProduction(productions, targetProduct, recipe, expectedYieldPerMin);
   if (isMineralRecipe(recipe) == false) {
     for (let material in recipe.materials) {
@@ -58,6 +61,7 @@ function calculateProductions(
       productions = productions.concat(subProductions);
     }
   }
+
   return productions;
 }
 
@@ -78,9 +82,8 @@ function addProduction(
 export function calculate(
   targetProduct: string,
   expectedYieldPerMin: number,
-  specifiedRecipes: RecipeModel[],
+  specifiedRecipes: { [item: string]: RecipeModel },
 ) {
-  console.log(specifiedRecipes);
   let productions = calculateProductions(
     targetProduct,
     expectedYieldPerMin,

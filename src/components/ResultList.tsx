@@ -2,10 +2,12 @@ import React from 'react';
 import { getRecipe, RecipeModel } from '../recipes';
 import { ResultModel } from '../main';
 import ResultDetail from './ResultDetail';
-import { Table } from 'antd';
+import { Table, Typography } from 'antd';
 import RecipeEntry from './RecipeEntry';
 import ResultBuilding from './ResultBuilding';
 import ItemImageAvatar from './ItemImageAvatar';
+
+const { Title } = Typography;
 
 interface IProps {
   targetItem?: string;
@@ -55,7 +57,7 @@ export default class ResultList extends React.Component<IProps, IState> {
       ),
     },
     {
-      title: '设施数量',
+      title: '设施/矿脉',
       dataIndex: 'building',
       key: 'building',
       width: 400,
@@ -103,8 +105,8 @@ export default class ResultList extends React.Component<IProps, IState> {
 
       return (
         <div>
+          <Title level={3}>计算结果</Title>
           <Table
-            // bordered={true}
             pagination={false}
             columns={this.columns}
             expandable={{
@@ -117,6 +119,6 @@ export default class ResultList extends React.Component<IProps, IState> {
         </div>
       );
     }
-    return <div>测试</div>;
+    return <div></div>;
   }
 }

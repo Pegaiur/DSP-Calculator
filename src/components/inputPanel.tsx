@@ -1,6 +1,7 @@
 import React from 'react';
 import ItemSelect from './ItemSelect';
-import { InputNumber } from 'antd';
+import { InputNumber, Button } from 'antd';
+import { BarChartOutlined } from '@ant-design/icons';
 
 interface IProps {
   calculate(targetItem: string, expectedValue: number): void;
@@ -21,7 +22,7 @@ export default class InputPanel extends React.Component<IProps, IState> {
     this.handleSelect = this.handleSelect.bind(this);
 
     this.state = {
-      expectedValue: 0,
+      expectedValue: 60,
       warning: true,
       targetItem: '宇宙矩阵',
     };
@@ -48,7 +49,7 @@ export default class InputPanel extends React.Component<IProps, IState> {
 
   render() {
     const warningLabel = this.state.warning ? (
-      <h3>请输入期望产量数字（单位：个/分钟）</h3>
+      <span>(单位：个/分钟）</span>
     ) : (
       <div></div>
     );
@@ -66,7 +67,17 @@ export default class InputPanel extends React.Component<IProps, IState> {
           onInput={this.handleInput}
         />
         {warningLabel}
-        <button onClick={this.handleClick}>计算</button>
+        <br />
+        <br />
+        <Button
+          type="primary"
+          shape="round"
+          size="large"
+          icon={<BarChartOutlined />}
+          onClick={this.handleClick}
+        >
+          计算
+        </Button>
       </div>
     );
   }

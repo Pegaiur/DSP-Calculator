@@ -1,5 +1,7 @@
+import styles from './SelectRecipeModal.less';
+
 import React from 'react';
-import { Modal, Row, Radio } from 'antd';
+import { Modal, Row } from 'antd';
 import ItemImageAvatar from './ItemImageAvatar';
 import { RecipeModel, getRecipe } from '../recipes';
 import RecipeEntry from './RecipeEntry';
@@ -70,12 +72,12 @@ export default class SelectRecipeModal extends React.Component<IProps, IState> {
         onOk={() => this.onOKCheck()}
         onCancel={() => this.onCancelCheck()}
         visible={this.props.isVisibale}
-        destroyOnClose={true}
       >
         <p>选择要使用的配方</p>
         {recipes.map((recipe, index) => {
           return (
             <RecipeEntry
+              className={styles.availableRecipe}
               recipe={recipe}
               key={index}
               selected={recipe.recipeID == selectedRecipe.recipeID}

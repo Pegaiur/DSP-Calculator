@@ -3,10 +3,13 @@ import styles from './index.less';
 import InputPanel from '../components/InputPanel';
 import ResultList from '../components/ResultList';
 import SelectRecipeModal from '../components/SelectRecipeModal';
-import SumReportPanel from '../components/SumReport';
+import SumReportPanel from '../components/SumReportPanel';
 import { PageHeader, Layout, Result, Button, Drawer, Affix, Modal } from 'antd';
 import { RecipeModel } from '@/recipes';
 import { calculate, ResultModel } from '../main';
+import { PlusOutlined, QuestionCircleOutlined } from '@ant-design/icons';
+import dspLogo from '../assets/Dsp-Logo.png';
+import { faqString } from '../faq';
 
 const { Header, Content, Footer } = Layout;
 
@@ -32,9 +35,10 @@ export default class IndexPage extends React.Component<IProps, IState> {
     this.onClose = this.onClose.bind(this);
     this.onChangeRecipe = this.onChangeRecipe.bind(this);
     this.changeRecipe = this.changeRecipe.bind(this);
+    this.onJump = this.onJump.bind(this);
 
     this.state = {
-      expectedYieldPerMin: 0,
+      expectedYieldPerMin: 60,
       isDrawerVisible: false,
       specifiedRecipes: {},
       isModalVisible: false,
@@ -52,7 +56,7 @@ export default class IndexPage extends React.Component<IProps, IState> {
         let results = calculate(
           this.state.targetItem!,
           this.state.expectedYieldPerMin,
-          Object.values(this.state.specifiedRecipes),
+          this.state.specifiedRecipes,
         );
         this.setState({ results: results });
       },
@@ -95,6 +99,10 @@ export default class IndexPage extends React.Component<IProps, IState> {
     });
   };
 
+  onJump(link: string) {
+    const w = window.open(link);
+  }
+
   render() {
     let content = <Content></Content>;
     if (this.state.results == undefined) {
@@ -118,25 +126,6 @@ export default class IndexPage extends React.Component<IProps, IState> {
             results={this.state.results![1]}
             onChangeRecipe={this.onChangeRecipe}
           />
-          <span>
-            {this.state.results[0] == {}
-              ? '没有多余副产物'
-              : '副产物:' +
-                Object.keys(this.state.results[0]).map((byproduct) => {
-                  return `${byproduct}: ${this.state.results![0][byproduct]}`;
-                })}
-          </span>
-          <Affix offsetBottom={100}>
-            <Button
-              className={styles.mainAffix}
-              type="primary"
-              shape="round"
-              size="large"
-              onClick={this.showDrawer}
-            >
-              添加产能
-            </Button>
-          </Affix>
           <SelectRecipeModal
             isVisibale={this.state.isModalVisible}
             changingRecipeItem={this.state.changingRecipeItem!}
@@ -144,16 +133,49 @@ export default class IndexPage extends React.Component<IProps, IState> {
             onCancel={() => this.setState({ isModalVisible: false })}
             onOk={this.changeRecipe}
           />
-          {/* {sumPanel} */}
+          <SumReportPanel byproduct={this.state.results![0]} />
+          <Affix offsetBottom={100}>
+            <Button
+              className={styles.mainAffix}
+              type="primary"
+              shape="round"
+              size="large"
+              icon={<PlusOutlined />}
+              onClick={this.showDrawer}
+            >
+              添加产能
+            </Button>
+          </Affix>
         </Content>
       );
     }
     return (
       <Layout>
-        <PageHeader title="戴森球计划产能计算器" subTitle="v0.0.1" />
+        <PageHeader
+          title="戴森球计划量化计算器"
+          subTitle="v0.1"
+          avatar={{ src: dspLogo }}
+          extra={[
+            <Button
+              type="primary"
+              shape="round"
+              size="large"
+              icon={<QuestionCircleOutlined />}
+              onClick={() =>
+                Modal.info({
+                  title: 'FAQ',
+                  content: <div style={{ whiteSpace: 'pre' }}>{faqString}</div>,
+                  onOk() {},
+                })
+              }
+            >
+              FAQ
+            </Button>,
+          ]}
+        />
         <Drawer
           title="添加产能"
-          placement="right"
+          placement="left"
           closable={false}
           onClose={this.onClose}
           visible={this.state.isDrawerVisible}
@@ -161,6 +183,24 @@ export default class IndexPage extends React.Component<IProps, IState> {
           <InputPanel calculate={this.calculate} />
         </Drawer>
         {content}
+        <Footer>
+          <span>Powered by </span>
+          <a onClick={() => this.onJump('https://space.bilibili.com/16693558')}>
+            VirgooTeam 喂狗组{' '}
+          </a>
+          -
+          <a onClick={() => this.onJump('https://space.bilibili.com/58978')}>
+            {' '}
+            佩奇Pegaiur
+          </a>
+          &
+          <a
+            onClick={() => this.onJump('https://space.bilibili.com/486788855')}
+          >
+            TNA速通会
+          </a>
+          ©️ 2021
+        </Footer>
       </Layout>
     );
   }
