@@ -40,6 +40,7 @@ export default class ItemSelect extends React.Component<IProps, IState> {
     return (
       <Cascader
         size="large"
+        allowClear={false}
         placeholder="请选择目标产物"
         defaultValue={['物品等级9', '宇宙矩阵']}
         options={options}

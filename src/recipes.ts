@@ -149,14 +149,14 @@ export const mineralRecipes: RecipeModel[] = [
     miningMultiplier: MiningBuildingMultiplier.oilWell,
   },
   {
-    products: { 氢: 1 },
+    products: { 氢: 1, 重氢: 1 },
     materials: { 轨道采集器: 1 },
     time: 1,
     miningBuilding: MiningBuilding.gasGiantCollector,
     miningMultiplier: MiningBuildingMultiplier.gasGiantCollector,
   },
   {
-    products: { 重氢: 1 },
+    products: { 氢: 1, 可燃冰: 1 },
     materials: { 轨道采集器: 1 },
     time: 1,
     miningBuilding: MiningBuilding.gasGiantCollector,
@@ -371,7 +371,7 @@ let recipes: RecipeModel[] = [
     products: { 钢材: 1 },
     materials: { 铁块: 3 },
     time: 3,
-    processBuilding: ProcessBuilding.refinery,
+    processBuilding: ProcessBuilding.furnace,
   },
   {
     products: { 齿轮: 1 },
@@ -577,7 +577,7 @@ let recipes: RecipeModel[] = [
   // tier 6
   {
     products: { 氘核燃料棒: 1 },
-    materials: { 钛合金: 1, 重氢: 10, 电磁涡轮: 1 },
+    materials: { 钛合金: 1, 重氢: 10, 超级磁场环: 1 },
     time: 6,
     processBuilding: ProcessBuilding.bench,
   },
