@@ -1,66 +1,89 @@
-import React from 'react';
 import styles from './index.less';
+import dspLogo from '../assets/Dsp-Logo.png';
+
+import React from 'react';
 import InputPanel from '../components/InputPanel';
 import ResultList from '../components/ResultList';
 import SelectRecipeModal from '../components/SelectRecipeModal';
 import SumReportPanel from '../components/SumReportPanel';
-import { PageHeader, Layout, Result, Button, Drawer, Affix, Modal } from 'antd';
+import TargetPanel from '@/components/TargetPanel';
+import {
+  PageHeader,
+  Layout,
+  Result,
+  Button,
+  Drawer,
+  Affix,
+  Modal,
+  message,
+} from 'antd';
 import { RecipeModel } from '@/recipes';
-import { calculate, ResultModel } from '../main';
+import Plan from '@/models/Plan';
+import Calculation from '@/models/Calculation';
+import { GlobalParameter } from '@/models/Plan';
 import { PlusOutlined, QuestionCircleOutlined } from '@ant-design/icons';
-import dspLogo from '../assets/Dsp-Logo.png';
 import { faqString } from '../faq';
+import _ from 'lodash';
 
 const { Header, Content, Footer } = Layout;
 
 interface IProps {}
 
 interface IState {
-  expectedYieldPerMin: number;
-  targetItem?: string;
-  specifiedRecipes: { [item: string]: RecipeModel };
-  isDrawerVisible: boolean;
-  isModalVisible: boolean;
-  results?: [{ [item: string]: number }, ResultModel[]];
+  plan: Plan;
+  calculations: Calculation[];
   changingRecipeItem?: string;
   changingRecipe?: RecipeModel;
+
+  isDrawerVisible: boolean;
+  isModalVisible: boolean;
 }
 
 export default class IndexPage extends React.Component<IProps, IState> {
   constructor(props: IProps, state: IState) {
     super(props, state);
 
-    this.calculate = this.calculate.bind(this);
-    this.showDrawer = this.showDrawer.bind(this);
-    this.onClose = this.onClose.bind(this);
-    this.onChangeRecipe = this.onChangeRecipe.bind(this);
-    this.changeRecipe = this.changeRecipe.bind(this);
-    this.onJump = this.onJump.bind(this);
+    _.bindAll(this, [
+      'addCalculation',
+      'showDrawer',
+      'onClose',
+      'onChangeRecipe',
+      'changeRecipe',
+      'onJump',
+      'onChangeTarget',
+    ]);
 
+    const defaultGlobalParas: GlobalParameter = {
+      veinsUtilizationLevel: 0,
+      defaultBenchType: '制造台MKI',
+      defaultFractionBeltType: '传送带',
+      defaultGasGaintYield: { 氢: 0.75, 重氢: 0.05 },
+      defaultIceGaintYield: { 氢: 0.35, 可燃冰: 0.7 },
+    };
+    let plan = new Plan(defaultGlobalParas);
     this.state = {
-      expectedYieldPerMin: 60,
       isDrawerVisible: false,
-      specifiedRecipes: {},
       isModalVisible: false,
+      plan: plan,
+      calculations: plan.calculations,
     };
   }
 
-  calculate(targetItem: string, expectedValue: number) {
-    this.setState(
-      {
-        targetItem: targetItem,
-        expectedYieldPerMin: expectedValue,
-        isDrawerVisible: false,
-      },
-      () => {
-        let results = calculate(
-          this.state.targetItem!,
-          this.state.expectedYieldPerMin,
-          this.state.specifiedRecipes,
-        );
-        this.setState({ results: results });
-      },
-    );
+  addCalculation(targetItem: string, expectedValue: number) {
+    this.state.plan.newCalculation(targetItem, expectedValue);
+    this.setState({ isDrawerVisible: false });
+    message.success('已添加产能规划');
+  }
+
+  onChangeTarget(calculation: Calculation, expectedValue: number) {
+    this.state.plan.editCalculation(calculation, expectedValue);
+    this.setState({ calculations: this.state.plan.calculations });
+    if (expectedValue == 0) {
+      message.success('已删除产能规划');
+      console.log(this.state.calculations);
+    } else {
+      message.success('已修改产能规划');
+    }
   }
 
   onChangeRecipe(item: string, currentRecipe: RecipeModel) {
@@ -72,17 +95,19 @@ export default class IndexPage extends React.Component<IProps, IState> {
   }
 
   changeRecipe(recipe: RecipeModel) {
-    let newSpecifiedRecipes = { ...this.state.specifiedRecipes };
-    newSpecifiedRecipes[this.state.changingRecipeItem!] = recipe;
+    this.state.plan.updateSpecifiedRecipes(
+      this.state.changingRecipeItem!,
+      recipe,
+    );
     this.setState(
       {
         isModalVisible: false,
         changingRecipeItem: undefined,
         changingRecipe: undefined,
-        specifiedRecipes: newSpecifiedRecipes,
+        calculations: this.state.plan.calculations,
       },
       () => {
-        this.calculate(this.state.targetItem!, this.state.expectedYieldPerMin);
+        message.success('已更改配方');
       },
     );
   }
@@ -105,7 +130,7 @@ export default class IndexPage extends React.Component<IProps, IState> {
 
   render() {
     let content = <Content></Content>;
-    if (this.state.results == undefined) {
+    if (this.state.plan.calculations.length == 0) {
       content = (
         <Content>
           <Result
@@ -121,9 +146,13 @@ export default class IndexPage extends React.Component<IProps, IState> {
     } else {
       content = (
         <Content>
+          <TargetPanel
+            calculations={this.state.calculations}
+            onChangeTarget={this.onChangeTarget}
+          />
           <ResultList
-            targetItem={this.state.targetItem}
-            results={this.state.results![1]}
+            plan={this.state.plan}
+            displayResults={this.state.plan.displayResults}
             onChangeRecipe={this.onChangeRecipe}
           />
           <SelectRecipeModal
@@ -133,7 +162,7 @@ export default class IndexPage extends React.Component<IProps, IState> {
             onCancel={() => this.setState({ isModalVisible: false })}
             onOk={this.changeRecipe}
           />
-          <SumReportPanel byproduct={this.state.results![0]} />
+          <SumReportPanel byproduct={this.state.plan.byproducts} />
           <Affix offsetBottom={100}>
             <Button
               className={styles.mainAffix}
@@ -181,7 +210,7 @@ export default class IndexPage extends React.Component<IProps, IState> {
           onClose={this.onClose}
           visible={this.state.isDrawerVisible}
         >
-          <InputPanel calculate={this.calculate} />
+          <InputPanel calculate={this.addCalculation} />
         </Drawer>
         {content}
         <Footer>

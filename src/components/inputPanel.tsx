@@ -1,6 +1,6 @@
 import React from 'react';
 import ItemSelect from './ItemSelect';
-import { InputNumber, Button } from 'antd';
+import { InputNumber, Button, Popconfirm } from 'antd';
 import { BarChartOutlined } from '@ant-design/icons';
 
 interface IProps {
@@ -28,7 +28,7 @@ export default class InputPanel extends React.Component<IProps, IState> {
     };
   }
 
-  handleInput(value: React.ReactText) {
+  handleInput(value: string) {
     const inputValue = parseInt(`${value}`);
     if (isNaN(inputValue)) {
       this.setState({ expectedValue: 0, warning: true });
@@ -64,7 +64,7 @@ export default class InputPanel extends React.Component<IProps, IState> {
           min={1}
           max={65535}
           value={this.state.expectedValue}
-          onChange={this.handleInput}
+          onChange={(value) => this.handleInput(`${value}`)}
         />
         {warningLabel}
         <br />

@@ -1,6 +1,9 @@
+import styles from './ResultList.less';
+
 import React from 'react';
 import { getRecipe, RecipeModel } from '../recipes';
-import { ResultModel } from '../main';
+import { ResultModel } from '@/models/Calculation';
+import Plan from '@/models/Plan';
 import ResultDetail from './ResultDetail';
 import { Table, Typography } from 'antd';
 import RecipeEntry from './RecipeEntry';
@@ -10,9 +13,9 @@ import ItemImageAvatar from './ItemImageAvatar';
 const { Title } = Typography;
 
 interface IProps {
-  targetItem?: string;
+  plan: Plan;
+  displayResults: ResultModel[];
   onChangeRecipe(item: string, currentRecipe: RecipeModel): void;
-  results: ResultModel[];
 }
 
 interface IState {}
@@ -23,6 +26,7 @@ export interface TableData {
   totalYieldPerMin: number;
   recipe: RecipeModel;
   consumptionDetail: { [item: string]: number };
+  isTarget: boolean;
 }
 
 export default class ResultList extends React.Component<IProps, IState> {
@@ -31,9 +35,7 @@ export default class ResultList extends React.Component<IProps, IState> {
 
     this.onChangeRecipe = this.onChangeRecipe.bind(this);
 
-    this.state = {
-      results: [],
-    };
+    this.state = {};
   }
 
   columns = [
@@ -91,34 +93,33 @@ export default class ResultList extends React.Component<IProps, IState> {
   }
 
   render() {
-    if (this.props.targetItem != undefined) {
-      let datas = this.props.results.map((result, index) => {
-        let data: TableData = {
-          key: index,
-          item: result.item,
-          totalYieldPerMin: result.totalYieldPerMin,
-          recipe: result.currentRecipe,
-          consumptionDetail: result.consumptionDetail,
-        };
-        return data;
-      });
+    let datas = this.props.displayResults.map((result, index) => {
+      let data: TableData = {
+        key: index,
+        item: result.item,
+        totalYieldPerMin: result.totalYieldPerMin,
+        recipe: result.currentRecipe,
+        consumptionDetail: result.consumptionDetail,
+        isTarget: result.isTarget == true ? true : false,
+      };
+      return data;
+    });
 
-      return (
-        <div>
-          <Title level={3}>计算结果</Title>
-          <Table
-            pagination={false}
-            columns={this.columns}
-            expandable={{
-              expandedRowRender: (data) => <ResultDetail data={data} />,
-              rowExpandable: (data) =>
-                Object.keys(data.consumptionDetail).length > 0,
-            }}
-            dataSource={datas}
-          />
-        </div>
-      );
-    }
-    return <div></div>;
+    return (
+      <div>
+        <Title level={3}>计算结果</Title>
+        <Table
+          pagination={false}
+          columns={this.columns}
+          expandable={{
+            expandedRowRender: (data) => <ResultDetail data={data} />,
+            rowExpandable: (data) =>
+              Object.keys(data.consumptionDetail).length > 0,
+          }}
+          rowClassName={(data) => (data.isTarget ? styles.targetRow : '')}
+          dataSource={datas}
+        />
+      </div>
+    );
   }
 }

@@ -1,10 +1,12 @@
 import React from 'react';
 import ItemImageAvatar from './ItemImageAvatar';
 import { Table, Typography } from 'antd';
+import _ from 'lodash';
 
 const { Title } = Typography;
 
 interface TableData {
+  key: string;
   item: string;
   totalYieldPerMin: number;
 }
@@ -20,17 +22,15 @@ export default class SumReportPanel extends React.Component<IProps, IState> {
     {
       title: '物品',
       dataIndex: 'item',
-      key: 'name',
+      key: 'byproduct name',
       render: (text: string, data: TableData) => (
-        <div>
-          <ItemImageAvatar item={data.item} showName={true} />
-        </div>
+        <ItemImageAvatar item={data.item} showName={true} />
       ),
     },
     {
       title: '产量',
       dataIndex: 'totalYieldPerMin',
-      key: 'yieldPerMin',
+      key: 'byproduct yieldPerMin',
       render: (text: string, data: TableData) => (
         <div>{data.totalYieldPerMin.toFixed(1)}</div>
       ),
@@ -43,7 +43,11 @@ export default class SumReportPanel extends React.Component<IProps, IState> {
     }
     let datas: TableData[] = [];
     for (let item in this.props.byproduct) {
-      datas.push({ item: item, totalYieldPerMin: this.props.byproduct[item] });
+      datas.push({
+        item: item,
+        totalYieldPerMin: this.props.byproduct[item],
+        key: item,
+      });
     }
     return (
       <div>

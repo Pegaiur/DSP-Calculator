@@ -389,7 +389,7 @@ let recipes: RecipeModel[] = [
     products: { 晶格硅: 1 },
     materials: { 高纯硅块: 1 },
     time: 2,
-    processBuilding: ProcessBuilding.refinery,
+    processBuilding: ProcessBuilding.furnace,
   },
   {
     products: { 金刚石: 1 },
@@ -570,7 +570,7 @@ let recipes: RecipeModel[] = [
   },
   {
     products: { 框架材料: 1 },
-    materials: { 碳纳米管: 2, 钛合金: 1, 高纯硅块: 1 },
+    materials: { 碳纳米管: 4, 钛合金: 1, 高纯硅块: 1 },
     time: 6,
     processBuilding: ProcessBuilding.bench,
   },
