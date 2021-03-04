@@ -1,5 +1,5 @@
 import React from 'react';
-import Calculation from '@/models/Calculation';
+import { Requirement } from '@/models/Core';
 import { Card, Popconfirm, InputNumber } from 'antd';
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import ItemImageAvatar from './ItemImageAvatar';
@@ -7,7 +7,7 @@ import ItemImageAvatar from './ItemImageAvatar';
 const { Meta } = Card;
 
 interface IProps {
-  calculation: Calculation;
+  requirement: Requirement;
   onChangeTarget(expectedValue: number): void;
 }
 
@@ -48,6 +48,7 @@ export default class TargetCard extends React.Component<IProps, IState> {
                 <InputNumber
                   min={1}
                   max={65535}
+                  defaultValue={this.props.requirement.expectedYieldPerMin}
                   value={this.state.expectedValue}
                   onChange={(value) => this.handleInput(`${value}`)}
                 />
@@ -71,9 +72,9 @@ export default class TargetCard extends React.Component<IProps, IState> {
         ]}
       >
         <Meta
-          avatar={<ItemImageAvatar item={this.props.calculation.targetItem} />}
-          title={this.props.calculation.targetItem}
-          description={`目标产量：${this.props.calculation.expectedYieldPerMin}/分钟`}
+          avatar={<ItemImageAvatar item={this.props.requirement.item} />}
+          title={this.props.requirement.item}
+          description={`目标产量：${this.props.requirement.expectedYieldPerMin}/分钟`}
         />
       </Card>
     );

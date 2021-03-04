@@ -65,7 +65,11 @@ export function calculateBuilding(
 export function getRecipe(item: string) {
   let availableRecipes: RecipeModel[] = [];
   recipes.forEach((recipe) => {
-    if (recipe.products[item] != undefined) {
+    if (recipe.equivalentRecipe != undefined) {
+      if (recipe.equivalentRecipe.products[item] != undefined) {
+        availableRecipes.push(recipe);
+      }
+    } else if (recipe.products[item] != undefined) {
       availableRecipes.push(recipe);
     }
   });
@@ -81,7 +85,7 @@ export function getOriginalRecipe(equivalentRecipe: RecipeModel) {
 }
 
 export function isMineralRecipe(recipe: RecipeModel) {
-  return mineralRecipes.indexOf(recipe) == -1 ? false : true;
+  return mineralRecipes.indexOf(recipe) != -1;
 }
 
 export const mineralRecipes: RecipeModel[] = [
@@ -278,8 +282,8 @@ let recipes: RecipeModel[] = [
   },
   {
     products: { 磁铁: 1 },
-    materials: { 铁矿: 1.5 },
-    time: 1,
+    materials: { 铁矿: 1 },
+    time: 1.5,
     processBuilding: ProcessBuilding.furnace,
   },
   {

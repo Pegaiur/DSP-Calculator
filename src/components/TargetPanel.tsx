@@ -1,13 +1,13 @@
 import React from 'react';
-import Calculation from '@/models/Calculation';
+import { Requirement } from '@/models/Core';
 import TargetCard from './TargetCard';
 import { Space, Typography } from 'antd';
 
 const { Title } = Typography;
 
 interface IProps {
-  calculations: Calculation[];
-  onChangeTarget(calculation: Calculation, expectedValue: number): void;
+  requirements: Requirement[];
+  onChangeTarget(item: string, expectedValue: number): void;
 }
 
 interface IState {}
@@ -23,13 +23,13 @@ export default class TargetPanel extends React.Component<IProps, IState> {
       <div>
         <Title level={3}>已规划产能</Title>
         <Space size={[8, 16]} wrap>
-          {this.props.calculations.map((calculation, index) => {
+          {this.props.requirements.map((requirement, index) => {
             return (
               <TargetCard
-                calculation={calculation}
+                requirement={requirement}
                 key={index}
                 onChangeTarget={(value) =>
-                  this.props.onChangeTarget(calculation, value)
+                  this.props.onChangeTarget(requirement.item, value)
                 }
               />
             );

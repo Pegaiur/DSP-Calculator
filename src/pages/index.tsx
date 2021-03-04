@@ -18,20 +18,22 @@ import {
   message,
 } from 'antd';
 import { RecipeModel } from '@/recipes';
-import Plan from '@/models/Plan';
-import Calculation from '@/models/Calculation';
-import { GlobalParameter } from '@/models/Plan';
+import Core, { ResultModel, Requirement } from '@/models/Core';
+import { GlobalParameter } from '@/models/Core';
 import { PlusOutlined, QuestionCircleOutlined } from '@ant-design/icons';
 import { faqString } from '../faq';
 import _ from 'lodash';
 
-const { Header, Content, Footer } = Layout;
+const { Content, Footer } = Layout;
 
 interface IProps {}
 
 interface IState {
-  plan: Plan;
-  calculations: Calculation[];
+  requirements: { [item: string]: number };
+  specifiedRecipes: { [item: string]: RecipeModel };
+  globalParas: GlobalParameter;
+  results: ResultModel[];
+  byproducts: { [item: string]: number };
   changingRecipeItem?: string;
   changingRecipe?: RecipeModel;
 
@@ -40,13 +42,13 @@ interface IState {
 }
 
 export default class IndexPage extends React.Component<IProps, IState> {
+  core: Core;
+
   constructor(props: IProps, state: IState) {
     super(props, state);
 
     _.bindAll(this, [
       'addCalculation',
-      'showDrawer',
-      'onClose',
       'onChangeRecipe',
       'changeRecipe',
       'onJump',
@@ -60,30 +62,50 @@ export default class IndexPage extends React.Component<IProps, IState> {
       defaultGasGaintYield: { 氢: 0.75, 重氢: 0.05 },
       defaultIceGaintYield: { 氢: 0.35, 可燃冰: 0.7 },
     };
-    let plan = new Plan(defaultGlobalParas);
+    this.core = new Core(defaultGlobalParas);
     this.state = {
+      requirements: {},
+      specifiedRecipes: {},
+      globalParas: defaultGlobalParas,
+      results: [],
+      byproducts: {},
       isDrawerVisible: false,
       isModalVisible: false,
-      plan: plan,
-      calculations: plan.calculations,
     };
   }
 
   addCalculation(targetItem: string, expectedValue: number) {
-    this.state.plan.newCalculation(targetItem, expectedValue);
+    if (this.state.requirements[targetItem] == undefined) {
+      this.state.requirements[targetItem] = expectedValue;
+    } else {
+      this.state.requirements[targetItem] += expectedValue;
+    }
     this.setState({ isDrawerVisible: false });
-    message.success('已添加产能规划');
+    this.core.calculate(this.state.requirements, (results, byproducts) => {
+      this.setState({
+        requirements: this.state.requirements,
+        results: results,
+        byproducts: byproducts,
+      });
+      message.success('已添加产能规划');
+    });
   }
 
-  onChangeTarget(calculation: Calculation, expectedValue: number) {
-    this.state.plan.editCalculation(calculation, expectedValue);
-    this.setState({ calculations: this.state.plan.calculations });
+  onChangeTarget(target: string, expectedValue: number) {
+    let requirements = this.state.requirements;
     if (expectedValue == 0) {
-      message.success('已删除产能规划');
-      console.log(this.state.calculations);
+      delete requirements[target];
     } else {
-      message.success('已修改产能规划');
+      requirements[target] = expectedValue;
     }
+    this.core.calculate(requirements, (results, byproducts) => {
+      this.setState({
+        requirements: requirements,
+        results: results,
+        byproducts: byproducts,
+      });
+      message.success(`已${expectedValue == 0 ? '删除' : '修改'}修改产能规划`);
+    });
   }
 
   onChangeRecipe(item: string, currentRecipe: RecipeModel) {
@@ -95,34 +117,27 @@ export default class IndexPage extends React.Component<IProps, IState> {
   }
 
   changeRecipe(recipe: RecipeModel) {
-    this.state.plan.updateSpecifiedRecipes(
-      this.state.changingRecipeItem!,
-      recipe,
-    );
+    let specifiedRecipes: { [item: string]: RecipeModel } = {};
+    _.assign(specifiedRecipes, this.state.specifiedRecipes);
+    specifiedRecipes[this.state.changingRecipeItem!] = recipe;
     this.setState(
       {
         isModalVisible: false,
         changingRecipeItem: undefined,
         changingRecipe: undefined,
-        calculations: this.state.plan.calculations,
+        specifiedRecipes: specifiedRecipes,
       },
       () => {
-        message.success('已更改配方');
+        this.core.updateSpecifiedRecipes(
+          this.state.specifiedRecipes,
+          (results, byproducts) => {
+            this.setState({ results: results, byproducts: byproducts });
+            message.success('已更改配方');
+          },
+        );
       },
     );
   }
-
-  showDrawer = () => {
-    this.setState({
-      isDrawerVisible: true,
-    });
-  };
-
-  onClose = () => {
-    this.setState({
-      isDrawerVisible: false,
-    });
-  };
 
   onJump(link: string) {
     const w = window.open(link);
@@ -130,13 +145,17 @@ export default class IndexPage extends React.Component<IProps, IState> {
 
   render() {
     let content = <Content></Content>;
-    if (this.state.plan.calculations.length == 0) {
+    if (this.state.results.length == 0) {
       content = (
         <Content>
           <Result
             title="还没有添加产能目标"
             extra={
-              <Button type="primary" onClick={this.showDrawer} key="console">
+              <Button
+                type="primary"
+                onClick={() => this.setState({ isDrawerVisible: true })}
+                key="console"
+              >
                 添加产能
               </Button>
             }
@@ -147,12 +166,13 @@ export default class IndexPage extends React.Component<IProps, IState> {
       content = (
         <Content>
           <TargetPanel
-            calculations={this.state.calculations}
+            requirements={this.core.requirementsConvert(
+              this.state.requirements,
+            )}
             onChangeTarget={this.onChangeTarget}
           />
           <ResultList
-            plan={this.state.plan}
-            displayResults={this.state.plan.displayResults}
+            results={this.state.results}
             onChangeRecipe={this.onChangeRecipe}
           />
           <SelectRecipeModal
@@ -162,7 +182,7 @@ export default class IndexPage extends React.Component<IProps, IState> {
             onCancel={() => this.setState({ isModalVisible: false })}
             onOk={this.changeRecipe}
           />
-          <SumReportPanel byproduct={this.state.plan.byproducts} />
+          <SumReportPanel byproduct={this.state.byproducts} />
           <Affix offsetBottom={100}>
             <Button
               className={styles.mainAffix}
@@ -170,7 +190,7 @@ export default class IndexPage extends React.Component<IProps, IState> {
               shape="round"
               size="large"
               icon={<PlusOutlined />}
-              onClick={this.showDrawer}
+              onClick={() => this.setState({ isDrawerVisible: true })}
             >
               添加产能
             </Button>
@@ -182,7 +202,7 @@ export default class IndexPage extends React.Component<IProps, IState> {
       <Layout>
         <PageHeader
           title="戴森球计划量化计算器"
-          subTitle="v0.1"
+          subTitle="v0.3"
           avatar={{ src: dspLogo }}
           extra={[
             <Button
@@ -207,7 +227,7 @@ export default class IndexPage extends React.Component<IProps, IState> {
           title="添加产能"
           placement="left"
           closable={false}
-          onClose={this.onClose}
+          onClose={() => this.setState({ isDrawerVisible: false })}
           visible={this.state.isDrawerVisible}
         >
           <InputPanel calculate={this.addCalculation} />
@@ -216,7 +236,7 @@ export default class IndexPage extends React.Component<IProps, IState> {
         <Footer>
           <span>Powered by </span>
           <a onClick={() => this.onJump('https://space.bilibili.com/16693558')}>
-            VirgooTeam 喂狗组{' '}
+            VirgooTeam喂狗组{' '}
           </a>
           -
           <a onClick={() => this.onJump('https://space.bilibili.com/58978')}>

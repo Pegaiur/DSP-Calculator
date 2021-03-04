@@ -2,8 +2,7 @@ import styles from './ResultList.less';
 
 import React from 'react';
 import { getRecipe, RecipeModel } from '../recipes';
-import { ResultModel } from '@/models/Calculation';
-import Plan from '@/models/Plan';
+import { ResultModel } from '@/models/Core';
 import ResultDetail from './ResultDetail';
 import { Table, Typography } from 'antd';
 import RecipeEntry from './RecipeEntry';
@@ -13,8 +12,7 @@ import ItemImageAvatar from './ItemImageAvatar';
 const { Title } = Typography;
 
 interface IProps {
-  plan: Plan;
-  displayResults: ResultModel[];
+  results: ResultModel[];
   onChangeRecipe(item: string, currentRecipe: RecipeModel): void;
 }
 
@@ -93,7 +91,7 @@ export default class ResultList extends React.Component<IProps, IState> {
   }
 
   render() {
-    let datas = this.props.displayResults.map((result, index) => {
+    let datas = this.props.results.map((result, index) => {
       let data: TableData = {
         key: index,
         item: result.item,
