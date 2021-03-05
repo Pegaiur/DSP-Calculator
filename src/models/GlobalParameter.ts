@@ -7,7 +7,7 @@ export default interface GlobalParameter {
 }
 
 export let defaultGlobalParameter: GlobalParameter = {
-  veinsUtilizationLevel: 0,
+  veinsUtilizationLevel: 1,
   defaultBenchType: '制造台MKI',
   defaultFractionBeltType: '传送带',
   defaultGasGaintYield: { 氢: 0.75, 重氢: 0.05 },

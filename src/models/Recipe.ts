@@ -8,7 +8,7 @@ export default class Recipe implements CompactRecipe {
   materials: { [name: string]: number };
   time: number;
   building: Building;
-  equivalentRecipe?: Recipe;
+  equivalentRecipe?: CompactRecipe;
   calculator?(targetProduct: string, globalParameters: GlobalParameter): number;
 
   constructor(rawRecipe: RawRecipe) {
@@ -18,18 +18,25 @@ export default class Recipe implements CompactRecipe {
     this.time = rawRecipe.time;
     this.building = rawRecipe.building;
     this.calculator = rawRecipe.calculator;
+    this.equivalentRecipe = rawRecipe.equivalentRecipe;
   }
 
   recipeYPM(targetProduct: string, globalParameters: GlobalParameter) {
     if (this.calculator != undefined) {
       return this.calculator(targetProduct, globalParameters);
     }
+    let time = this.time;
+    let products = this.products;
+    if (this.equivalentRecipe != undefined) {
+      time = this.equivalentRecipe.time;
+      products = this.equivalentRecipe.products;
+    }
     let basicYPM =
-      (60 / this.time) *
-      this.products[targetProduct] *
+      (60 / time) *
+      products[targetProduct] *
       this.building.productionMultiplier;
     return this.isMiningRecipe()
-      ? basicYPM * globalParameters.veinsUtilizationLevel
+      ? basicYPM * (1 + 0.1 * globalParameters.veinsUtilizationLevel)
       : basicYPM;
   }
 
@@ -41,8 +48,14 @@ export default class Recipe implements CompactRecipe {
     let ratio =
       expectedYieldPerMin / this.recipeYPM(targetProduct, globalParameters);
     let materialYPMs: { [name: string]: number } = {};
-    for (let material in this.materials) {
-      let materialYPM = (60 / this.time) * this.materials[material] * ratio;
+    let time = this.time;
+    let materials = this.materials;
+    if (this.equivalentRecipe != undefined) {
+      time = this.equivalentRecipe.time;
+      materials = this.equivalentRecipe.materials;
+    }
+    for (let material in materials) {
+      let materialYPM = (60 / time) * materials[material] * ratio;
       materialYPMs[material] = materialYPM;
     }
     return materialYPMs;
@@ -92,6 +105,35 @@ export function getRecipe(item: string) {
     }
   });
   return availableRecipes;
+}
+
+function orbitalCollectorYPS(
+  item: string,
+  itemEnergy: { [item: string]: number },
+  globalPara: { [item: string]: number },
+  veinsUtilizationLevel: number,
+) {
+  // PPS = Power Per Second
+  const itemPPS =
+    globalPara[item] *
+    itemEnergy[item] *
+    miningBuildings.orbitalCollector.productionMultiplier *
+    (1 + 0.1 * veinsUtilizationLevel);
+  let totalPPS = 0;
+  for (let i in itemEnergy) {
+    totalPPS +=
+      globalPara[i] *
+      itemEnergy[i] *
+      miningBuildings.orbitalCollector.productionMultiplier *
+      (1 + 0.1 * veinsUtilizationLevel);
+  }
+  const consumedYPS = ((itemPPS / totalPPS) * 30) / itemEnergy[item];
+  let itemYPS =
+    globalPara[item] *
+    60 *
+    miningBuildings.orbitalCollector.productionMultiplier *
+    (1 + 0.1 * veinsUtilizationLevel);
+  return itemYPS - consumedYPS;
 }
 
 const mineralRecipes: Recipe[] = [
@@ -154,12 +196,32 @@ const mineralRecipes: Recipe[] = [
     materials: { 气态巨行星: 1 },
     time: 1,
     building: miningBuildings.orbitalCollector,
+    calculator: (item, globalParas) => {
+      const itemEnergy: { [item: string]: number } = { 氢: 8, 重氢: 8 };
+      let itemYPS = orbitalCollectorYPS(
+        item,
+        itemEnergy,
+        globalParas.defaultGasGaintYield,
+        globalParas.veinsUtilizationLevel,
+      );
+      return itemYPS;
+    },
   }),
   new Recipe({
     products: { 氢: 1, 可燃冰: 1 },
     materials: { 冰巨行星: 1 },
     time: 1,
     building: miningBuildings.orbitalCollector,
+    calculator: (item, globalParas) => {
+      const itemEnergy: { [item: string]: number } = { 氢: 8, 可燃冰: 4.8 };
+      let itemYPS = orbitalCollectorYPS(
+        item,
+        itemEnergy,
+        globalParas.defaultIceGaintYield,
+        globalParas.veinsUtilizationLevel,
+      );
+      return itemYPS;
+    },
   }),
   new Recipe({
     products: { 临界光子: 1 },

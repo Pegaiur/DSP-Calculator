@@ -28,7 +28,7 @@ export default class Building {
     this.name = name;
     this.productionMultiplier = productionMultiplier;
     this.powerKW = powerKW;
-    this.powerMW = this.powerKW * 1000;
+    this.powerMW = this.powerKW / 1000;
   }
 }
 

@@ -57,17 +57,17 @@ export default class RecipeEntry extends React.Component<IProps, IState> {
   }
 
   render() {
-    let displayRecipe = this.props.recipe;
+    let calculateRecipe: CompactRecipe = this.props.recipe;
     if (this.props.recipe.equivalentRecipe != undefined) {
-      displayRecipe = this.props.recipe.equivalentRecipe;
+      calculateRecipe = this.props.recipe.equivalentRecipe;
     }
     return (
       <div className={this.props.className}>
-        {this.renderRow(displayRecipe)}
-        {this.props.recipe.recipeID == undefined ? (
+        {this.renderRow(this.props.recipe)}
+        {this.props.recipe.equivalentRecipe != undefined ? (
           <div>
             <span>等效计算配方：</span>
-            {this.renderRow(this.props.recipe)}
+            {this.renderRow(calculateRecipe)}
           </div>
         ) : null}
       </div>

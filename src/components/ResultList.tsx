@@ -1,31 +1,24 @@
 import styles from './ResultList.less';
 
 import React from 'react';
-import { getRecipe, RecipeModel } from '../recipes';
-import { ResultModel } from '@/models/Core';
+import Recipe, { getRecipe } from '@/models/Recipe';
+import DisplayResult from '@/models/DisplayResult';
 import ResultDetail from './ResultDetail';
 import { Table, Typography } from 'antd';
 import RecipeEntry from './RecipeEntry';
 import ResultBuilding from './ResultBuilding';
 import ItemImageAvatar from './ItemImageAvatar';
+import GlobalParameter from '@/models/GlobalParameter';
 
 const { Title } = Typography;
 
 interface IProps {
-  results: ResultModel[];
-  onChangeRecipe(item: string, currentRecipe: RecipeModel): void;
+  results: DisplayResult[];
+  globalParas: GlobalParameter;
+  onChangeRecipe(item: string, currentRecipe: Recipe): void;
 }
 
 interface IState {}
-
-export interface TableData {
-  key: number;
-  item: string;
-  totalYieldPerMin: number;
-  recipe: RecipeModel;
-  consumptionDetail: { [item: string]: number };
-  isTarget: boolean;
-}
 
 export default class ResultList extends React.Component<IProps, IState> {
   constructor(props: IProps, state: IState) {
@@ -41,7 +34,7 @@ export default class ResultList extends React.Component<IProps, IState> {
       title: '物品',
       dataIndex: 'item',
       key: 'name',
-      render: (text: string, data: TableData) => (
+      render: (text: string, data: DisplayResult) => (
         <div>
           <ItemImageAvatar item={data.item} showName={true} />
         </div>
@@ -52,8 +45,8 @@ export default class ResultList extends React.Component<IProps, IState> {
       dataIndex: 'totalYieldPerMin',
       key: 'yieldPerMin',
       width: 140,
-      render: (text: string, data: TableData) => (
-        <div>{data.totalYieldPerMin.toFixed(1)}</div>
+      render: (text: string, data: DisplayResult) => (
+        <div>{data.ypm.toFixed(1)}</div>
       ),
     },
     {
@@ -61,13 +54,15 @@ export default class ResultList extends React.Component<IProps, IState> {
       dataIndex: 'building',
       key: 'building',
       width: 400,
-      render: (text: string, data: TableData) => <ResultBuilding data={data} />,
+      render: (text: string, data: DisplayResult) => (
+        <ResultBuilding result={data} globalParas={this.props.globalParas} />
+      ),
     },
     {
       title: '配方',
       dataIndex: 'recipe',
       key: 'recipe',
-      render: (text: string, data: TableData) => (
+      render: (text: string, data: DisplayResult) => (
         <RecipeEntry
           recipe={data.recipe}
           selected={false}
@@ -79,30 +74,18 @@ export default class ResultList extends React.Component<IProps, IState> {
     {
       title: '操作',
       key: 'action',
-      render: (text: string, data: TableData) =>
+      render: (text: string, data: DisplayResult) =>
         getRecipe(data.item).length > 1 ? (
           <a onClick={() => this.onChangeRecipe(data)}>更改配方</a>
         ) : null,
     },
   ];
 
-  onChangeRecipe(data: TableData) {
+  onChangeRecipe(data: DisplayResult) {
     this.props.onChangeRecipe(data.item, data.recipe);
   }
 
   render() {
-    let datas = this.props.results.map((result, index) => {
-      let data: TableData = {
-        key: index,
-        item: result.item,
-        totalYieldPerMin: result.totalYieldPerMin,
-        recipe: result.currentRecipe,
-        consumptionDetail: result.consumptionDetail,
-        isTarget: result.isTarget == true ? true : false,
-      };
-      return data;
-    });
-
     return (
       <div>
         <Title level={3}>计算结果</Title>
@@ -110,12 +93,12 @@ export default class ResultList extends React.Component<IProps, IState> {
           pagination={false}
           columns={this.columns}
           expandable={{
-            expandedRowRender: (data) => <ResultDetail data={data} />,
+            expandedRowRender: (data) => <ResultDetail result={data} />,
             rowExpandable: (data) =>
               Object.keys(data.consumptionDetail).length > 0,
           }}
           rowClassName={(data) => (data.isTarget ? styles.targetRow : '')}
-          dataSource={datas}
+          dataSource={this.props.results}
         />
       </div>
     );

@@ -7,6 +7,7 @@ import ResultList from '../components/ResultList';
 import SelectRecipeModal from '../components/SelectRecipeModal';
 import SumReportPanel from '../components/SumReportPanel';
 import TargetPanel from '@/components/TargetPanel';
+import GlobalParasPanel from '@/components/GlobalParasPanel';
 import {
   PageHeader,
   Layout,
@@ -18,11 +19,16 @@ import {
   message,
 } from 'antd';
 import Recipe from '@/models/Recipe';
-import Core, { ResultModel } from '@/models/Core';
+import Core from '@/models/Core';
+import DisplayResult from '@/models/DisplayResult';
 import GlobalParameter, {
   defaultGlobalParameter,
 } from '@/models/GlobalParameter';
-import { PlusOutlined, QuestionCircleOutlined } from '@ant-design/icons';
+import {
+  PlusOutlined,
+  QuestionCircleOutlined,
+  ProfileOutlined,
+} from '@ant-design/icons';
 import { faqString } from '../faq';
 import _ from 'lodash';
 
@@ -34,11 +40,12 @@ interface IState {
   requirements: { [item: string]: number };
   specifiedRecipes: { [item: string]: Recipe };
   globalParas: GlobalParameter;
-  results: ResultModel[];
-  byproducts: { [item: string]: number };
+  results: DisplayResult[];
+  byproducts: DisplayResult[];
   changingRecipeItem?: string;
   changingRecipe?: Recipe;
 
+  isModifyingParas: boolean;
   isDrawerVisible: boolean;
   isModalVisible: boolean;
 }
@@ -63,7 +70,8 @@ export default class IndexPage extends React.Component<IProps, IState> {
       specifiedRecipes: {},
       globalParas: defaultGlobalParameter,
       results: [],
-      byproducts: {},
+      byproducts: [],
+      isModifyingParas: false,
       isDrawerVisible: false,
       isModalVisible: false,
     };
@@ -148,7 +156,15 @@ export default class IndexPage extends React.Component<IProps, IState> {
             extra={
               <Button
                 type="primary"
-                onClick={() => this.setState({ isDrawerVisible: true })}
+                shape="round"
+                size="large"
+                icon={<PlusOutlined />}
+                onClick={() =>
+                  this.setState({
+                    isModifyingParas: false,
+                    isDrawerVisible: true,
+                  })
+                }
                 key="console"
               >
                 添加产能
@@ -168,6 +184,7 @@ export default class IndexPage extends React.Component<IProps, IState> {
           />
           <ResultList
             results={this.state.results}
+            globalParas={this.state.globalParas}
             onChangeRecipe={this.onChangeRecipe}
           />
           <SelectRecipeModal
@@ -177,7 +194,7 @@ export default class IndexPage extends React.Component<IProps, IState> {
             onCancel={() => this.setState({ isModalVisible: false })}
             onOk={this.changeRecipe}
           />
-          <SumReportPanel byproduct={this.state.byproducts} />
+          <SumReportPanel byproducts={this.state.byproducts} />
           <Affix offsetBottom={100}>
             <Button
               className={styles.mainAffix}
@@ -185,12 +202,32 @@ export default class IndexPage extends React.Component<IProps, IState> {
               shape="round"
               size="large"
               icon={<PlusOutlined />}
-              onClick={() => this.setState({ isDrawerVisible: true })}
+              onClick={() =>
+                this.setState({
+                  isModifyingParas: false,
+                  isDrawerVisible: true,
+                })
+              }
             >
               添加产能
             </Button>
           </Affix>
         </Content>
+      );
+    }
+
+    let panel = <InputPanel calculate={this.addCalculation} />;
+    if (this.state.isModifyingParas) {
+      panel = (
+        <GlobalParasPanel
+          globalParas={this.state.globalParas}
+          onChangeGlobalParas={(paras) =>
+            this.setState({
+              globalParas: paras,
+              isDrawerVisible: false,
+            })
+          }
+        />
       );
     }
     return (
@@ -201,7 +238,18 @@ export default class IndexPage extends React.Component<IProps, IState> {
           avatar={{ src: dspLogo }}
           extra={[
             <Button
+              shape="round"
+              size="large"
+              key="global paras"
               type="primary"
+              icon={<ProfileOutlined />}
+              onClick={() =>
+                this.setState({ isModifyingParas: true, isDrawerVisible: true })
+              }
+            >
+              修改生产参数
+            </Button>,
+            <Button
               shape="round"
               size="large"
               key="faq"
@@ -219,13 +267,13 @@ export default class IndexPage extends React.Component<IProps, IState> {
           ]}
         />
         <Drawer
-          title="添加产能"
+          title={this.state.isModifyingParas ? '修改生产参数' : '添加产能'}
           placement="left"
           closable={false}
           onClose={() => this.setState({ isDrawerVisible: false })}
           visible={this.state.isDrawerVisible}
         >
-          <InputPanel calculate={this.addCalculation} />
+          {panel}
         </Drawer>
         {content}
         <Footer>

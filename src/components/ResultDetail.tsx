@@ -1,8 +1,8 @@
+import DisplayResult from '@/models/DisplayResult';
 import React from 'react';
-import { TableData } from './ResultList';
 
 interface IProps {
-  data: TableData;
+  result: DisplayResult;
 }
 
 interface IState {}
@@ -15,9 +15,9 @@ export default class ResultDetail extends React.Component<IProps, IState> {
   }
 
   render() {
-    let consumptions = Object.keys(this.props.data.consumptionDetail).map(
+    let consumptions = Object.keys(this.props.result.consumptionDetail).map(
       (product) => {
-        return `${product} 消耗了 ${this.props.data.consumptionDetail[product]} 产量`;
+        return `${product} 消耗了 ${this.props.result.consumptionDetail[product]} 产量`;
       },
     );
     return (

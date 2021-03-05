@@ -1,21 +1,9 @@
-import Recipe, { getRecipe, recipes } from '@/models/Recipe';
+import Recipe, { getRecipe } from './Recipe';
+import Production from './Production';
+import DisplayResult from './DisplayResult';
+import GlobalParameter from './GlobalParameter';
 import _ from 'lodash';
 import { allItemNameArray } from '@/items';
-import GlobalParameter from '@/models/GlobalParameter';
-
-export interface ProductionModel {
-  targetProduct: string;
-  recipe: Recipe;
-  yieldPerMin: number;
-}
-
-export interface ResultModel {
-  item: string;
-  currentRecipe: Recipe;
-  totalYieldPerMin: number;
-  consumptionDetail: { [item: string]: number };
-  isTarget: boolean;
-}
 
 export interface Requirement {
   item: string;
@@ -27,9 +15,10 @@ export default class Core {
   requirements: { [item: string]: number } = {};
   specifiedRecipes: { [item: string]: Recipe } = {};
 
-  private productions: ProductionModel[] = [];
-  private results: ResultModel[] = [];
-  private byproducts: { [item: string]: number } = {};
+  private productions: Production[] = [];
+  private byproductions: Production[] = [];
+  private results: DisplayResult[] = [];
+  private byproducts: DisplayResult[] = [];
   private calculateStack: Requirement[] = [];
 
   constructor(globalParameters: GlobalParameter) {
@@ -38,20 +27,16 @@ export default class Core {
 
   calculate(
     requirements: { [item: string]: number },
-    callback: (
-      results: ResultModel[],
-      byproducts: { [item: string]: number },
-    ) => void,
+    callback: (results: DisplayResult[], byproducts: DisplayResult[]) => void,
   ) {
+    this.cleanStack();
     this.requirements = requirements;
     this.calculateProductions();
-    this.results = [];
-    this.byproducts = {};
     this.productions.forEach((production) => {
-      this.addResult(production);
-      if (Object.keys(production.recipe.products).length > 1) {
-        this.addByproduct(production);
-      }
+      this.addResult(this.results, production);
+    });
+    this.byproductions.forEach((production) => {
+      this.addResult(this.byproducts, production);
     });
     this.productions.forEach((production) => {
       if (!production.recipe.isMiningRecipe()) {
@@ -69,10 +54,7 @@ export default class Core {
 
   updateSpecifiedRecipes(
     specifiedRecipes: { [item: string]: Recipe },
-    callback: (
-      results: ResultModel[],
-      byproducts: { [item: string]: number },
-    ) => void,
+    callback: (results: DisplayResult[], byproducts: DisplayResult[]) => void,
   ) {
     this.specifiedRecipes = specifiedRecipes;
     this.calculate(this.requirements, callback);
@@ -86,70 +68,113 @@ export default class Core {
     return requirements;
   }
 
-  private calculateProductions() {
+  private cleanStack() {
     this.productions = [];
+    this.byproductions = [];
     this.calculateStack = [];
+    this.results = [];
+    this.byproducts = [];
+  }
+
+  private calculateProductions() {
     let requirements = this.requirementsConvert(this.requirements);
     requirements.forEach((requirement) =>
       this.calculateStack.push(requirement),
     );
     for (let i = 0; i < this.calculateStack.length; i++) {
       const requirement = this.calculateStack[i];
-      let availableRecipes = getRecipe(requirement.item);
-      let recipe = availableRecipes[0];
-      if (this.specifiedRecipes[requirement.item] != undefined) {
-        recipe = this.specifiedRecipes[requirement.item];
-      }
-      if (recipe.equivalentRecipe != undefined) {
-        recipe = recipe.equivalentRecipe;
-      }
-      let production: ProductionModel = {
-        targetProduct: requirement.item,
-        recipe: recipe,
-        yieldPerMin: requirement.expectedYieldPerMin,
-      };
-      this.productions.push(production);
-      if (!recipe.isMiningRecipe()) {
-        let materialYPMs = recipe.materialYPM(
+      this.checkByproduction(requirement);
+      if (requirement.expectedYieldPerMin > 0) {
+        let availableRecipes = getRecipe(requirement.item);
+        let recipe = availableRecipes.find((recipe) => {
+          if (recipe.equivalentRecipe != undefined) {
+            return recipe.equivalentRecipe.products.length == 1;
+          }
+          return recipe.products.length == 1;
+        });
+        if (recipe == undefined) {
+          recipe = availableRecipes[0];
+        }
+        if (this.specifiedRecipes[requirement.item] != undefined) {
+          recipe = this.specifiedRecipes[requirement.item];
+        }
+        let production = new Production(
           requirement.item,
+          recipe,
           requirement.expectedYieldPerMin,
-          this.globalParameters,
         );
-        for (let material in materialYPMs) {
-          this.calculateStack.push({
-            item: material,
-            expectedYieldPerMin: materialYPMs[material],
-          });
+        this.productions.push(production);
+        this.byproductions = this.byproductions.concat(
+          production.byproducts(this.globalParameters),
+        );
+        if (!recipe.isMiningRecipe()) {
+          let materialYPMs = recipe.materialYPM(
+            requirement.item,
+            requirement.expectedYieldPerMin,
+            this.globalParameters,
+          );
+          for (let material in materialYPMs) {
+            this.calculateStack.push({
+              item: material,
+              expectedYieldPerMin: materialYPMs[material],
+            });
+          }
         }
       }
     }
   }
 
-  private addResult(production: ProductionModel) {
+  private checkByproduction(requirement: Requirement) {
+    for (let byproduction of this.byproductions) {
+      if (requirement.item == byproduction.targetProduct) {
+        if (requirement.expectedYieldPerMin - byproduction.ypm <= 0) {
+          let production = new Production(
+            requirement.item,
+            byproduction.recipe,
+            requirement.expectedYieldPerMin,
+          );
+          this.productions.push(production);
+          byproduction.ypm -= requirement.expectedYieldPerMin;
+          requirement.expectedYieldPerMin = 0;
+          break;
+        } else {
+          this.productions.push(byproduction);
+          _.remove(this.byproductions, (bp) => {
+            return bp.id == byproduction.id;
+          });
+          requirement.expectedYieldPerMin -= byproduction.ypm;
+        }
+      }
+    }
+  }
+
+  private addResult(results: DisplayResult[], production: Production) {
     let isResultAdded = false;
-    for (let result of this.results) {
-      if (result.item == production.targetProduct) {
-        result.totalYieldPerMin += production.yieldPerMin;
+    for (let result of results) {
+      if (result.mergeProduction(production)) {
         isResultAdded = true;
         break;
       }
     }
     if (isResultAdded == false) {
-      let result: ResultModel = {
-        item: production.targetProduct,
-        currentRecipe: production.recipe,
-        totalYieldPerMin: production.yieldPerMin,
-        consumptionDetail: {},
-        isTarget: this.requirements[production.targetProduct] != undefined,
-      };
-      this.results.push(result);
+      let result: DisplayResult = new DisplayResult(production);
+      (result.isTarget =
+        this.requirements[production.targetProduct] != undefined),
+        results.push(result);
     }
   }
 
-  private addConsumption(production: ProductionModel) {
-    for (let material in production.recipe.materials) {
+  private addConsumption(production: Production) {
+    if (production.recipe.calculator != undefined) {
+      return;
+    }
+    let materials = production.recipe.materials;
+    if (production.recipe.equivalentRecipe != undefined) {
+      materials = production.recipe.equivalentRecipe.materials;
+    }
+    for (let material in materials) {
       let consumptionPerMin =
-        (production.yieldPerMin /
+        (production.ypm /
           production.recipe.products[production.targetProduct]) *
         production.recipe.materials[material];
       for (let result of this.results) {
@@ -162,21 +187,6 @@ export default class Core {
           ] += consumptionPerMin;
           break;
         }
-      }
-    }
-  }
-
-  private addByproduct(production: ProductionModel) {
-    for (let product in production.recipe.products) {
-      if (product != production.targetProduct) {
-        let yieldPerMin =
-          (production.yieldPerMin /
-            production.recipe.products[production.targetProduct]) *
-          production.recipe.products[product];
-        if (this.byproducts[product] == undefined) {
-          this.byproducts[product] = 0;
-        }
-        this.byproducts[product] += yieldPerMin;
       }
     }
   }
