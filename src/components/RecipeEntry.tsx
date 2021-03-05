@@ -1,15 +1,15 @@
 import styles from './RecipeEntry.less';
 
-import { getOriginalRecipe, RecipeModel } from '@/recipes';
+import Recipe, { CompactRecipe } from '@/models/Recipe';
 import { Row, Col } from 'antd';
 import React from 'react';
 import ItemImageAvatar from './ItemImageAvatar';
 import { SwapRightOutlined } from '@ant-design/icons';
 
 interface IProps {
-  recipe: RecipeModel;
+  recipe: Recipe;
   selected: boolean;
-  onSelect(recipe: RecipeModel): void;
+  onSelect(recipe: Recipe): void;
   className?: string;
 }
 
@@ -22,7 +22,7 @@ export default class RecipeEntry extends React.Component<IProps, IState> {
     this.state = {};
   }
 
-  renderRow(recipe: RecipeModel) {
+  renderRow(recipe: CompactRecipe) {
     return (
       <Row
         className={this.props.selected ? styles.selectedRow : styles.normalRow}
@@ -58,8 +58,8 @@ export default class RecipeEntry extends React.Component<IProps, IState> {
 
   render() {
     let displayRecipe = this.props.recipe;
-    if (this.props.recipe.recipeID == undefined) {
-      displayRecipe = getOriginalRecipe(this.props.recipe)!;
+    if (this.props.recipe.equivalentRecipe != undefined) {
+      displayRecipe = this.props.recipe.equivalentRecipe;
     }
     return (
       <div className={this.props.className}>

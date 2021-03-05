@@ -1,29 +1,17 @@
-import {
-  RecipeModel,
-  getRecipe,
-  isMineralRecipe,
-  calculateMaterialYPM,
-} from '@/recipes';
+import Recipe, { getRecipe, recipes } from '@/models/Recipe';
 import _ from 'lodash';
 import { allItemNameArray } from '@/items';
-
-export interface GlobalParameter {
-  veinsUtilizationLevel: number;
-  defaultBenchType: string;
-  defaultFractionBeltType: string;
-  defaultGasGaintYield: { [item: string]: number };
-  defaultIceGaintYield: { [item: string]: number };
-}
+import GlobalParameter from '@/models/GlobalParameter';
 
 export interface ProductionModel {
   targetProduct: string;
-  recipe: RecipeModel;
+  recipe: Recipe;
   yieldPerMin: number;
 }
 
 export interface ResultModel {
   item: string;
-  currentRecipe: RecipeModel;
+  currentRecipe: Recipe;
   totalYieldPerMin: number;
   consumptionDetail: { [item: string]: number };
   isTarget: boolean;
@@ -37,11 +25,11 @@ export interface Requirement {
 export default class Core {
   globalParameters: GlobalParameter;
   requirements: { [item: string]: number } = {};
-  specifiedRecipes: { [item: string]: RecipeModel } = {};
+  specifiedRecipes: { [item: string]: Recipe } = {};
 
-  productions: ProductionModel[] = [];
-  results: ResultModel[] = [];
-  byproducts: { [item: string]: number } = {};
+  private productions: ProductionModel[] = [];
+  private results: ResultModel[] = [];
+  private byproducts: { [item: string]: number } = {};
   private calculateStack: Requirement[] = [];
 
   constructor(globalParameters: GlobalParameter) {
@@ -66,7 +54,7 @@ export default class Core {
       }
     });
     this.productions.forEach((production) => {
-      if (isMineralRecipe(production.recipe) == false) {
+      if (!production.recipe.isMiningRecipe()) {
         this.addConsumption(production);
       }
     });
@@ -80,7 +68,7 @@ export default class Core {
   }
 
   updateSpecifiedRecipes(
-    specifiedRecipes: { [item: string]: RecipeModel },
+    specifiedRecipes: { [item: string]: Recipe },
     callback: (
       results: ResultModel[],
       byproducts: { [item: string]: number },
@@ -121,17 +109,16 @@ export default class Core {
         yieldPerMin: requirement.expectedYieldPerMin,
       };
       this.productions.push(production);
-      if (isMineralRecipe(recipe) == false) {
-        for (let material in recipe.materials) {
-          const materialExpectedYieldPerMin = calculateMaterialYPM(
-            requirement.item,
-            material,
-            recipe,
-            requirement.expectedYieldPerMin,
-          );
+      if (!recipe.isMiningRecipe()) {
+        let materialYPMs = recipe.materialYPM(
+          requirement.item,
+          requirement.expectedYieldPerMin,
+          this.globalParameters,
+        );
+        for (let material in materialYPMs) {
           this.calculateStack.push({
             item: material,
-            expectedYieldPerMin: materialExpectedYieldPerMin,
+            expectedYieldPerMin: materialYPMs[material],
           });
         }
       }

@@ -17,9 +17,11 @@ import {
   Modal,
   message,
 } from 'antd';
-import { RecipeModel } from '@/recipes';
-import Core, { ResultModel, Requirement } from '@/models/Core';
-import { GlobalParameter } from '@/models/Core';
+import Recipe from '@/models/Recipe';
+import Core, { ResultModel } from '@/models/Core';
+import GlobalParameter, {
+  defaultGlobalParameter,
+} from '@/models/GlobalParameter';
 import { PlusOutlined, QuestionCircleOutlined } from '@ant-design/icons';
 import { faqString } from '../faq';
 import _ from 'lodash';
@@ -30,12 +32,12 @@ interface IProps {}
 
 interface IState {
   requirements: { [item: string]: number };
-  specifiedRecipes: { [item: string]: RecipeModel };
+  specifiedRecipes: { [item: string]: Recipe };
   globalParas: GlobalParameter;
   results: ResultModel[];
   byproducts: { [item: string]: number };
   changingRecipeItem?: string;
-  changingRecipe?: RecipeModel;
+  changingRecipe?: Recipe;
 
   isDrawerVisible: boolean;
   isModalVisible: boolean;
@@ -55,18 +57,11 @@ export default class IndexPage extends React.Component<IProps, IState> {
       'onChangeTarget',
     ]);
 
-    const defaultGlobalParas: GlobalParameter = {
-      veinsUtilizationLevel: 0,
-      defaultBenchType: '制造台MKI',
-      defaultFractionBeltType: '传送带',
-      defaultGasGaintYield: { 氢: 0.75, 重氢: 0.05 },
-      defaultIceGaintYield: { 氢: 0.35, 可燃冰: 0.7 },
-    };
-    this.core = new Core(defaultGlobalParas);
+    this.core = new Core(defaultGlobalParameter);
     this.state = {
       requirements: {},
       specifiedRecipes: {},
-      globalParas: defaultGlobalParas,
+      globalParas: defaultGlobalParameter,
       results: [],
       byproducts: {},
       isDrawerVisible: false,
@@ -108,7 +103,7 @@ export default class IndexPage extends React.Component<IProps, IState> {
     });
   }
 
-  onChangeRecipe(item: string, currentRecipe: RecipeModel) {
+  onChangeRecipe(item: string, currentRecipe: Recipe) {
     this.setState({
       isModalVisible: true,
       changingRecipe: currentRecipe,
@@ -116,8 +111,8 @@ export default class IndexPage extends React.Component<IProps, IState> {
     });
   }
 
-  changeRecipe(recipe: RecipeModel) {
-    let specifiedRecipes: { [item: string]: RecipeModel } = {};
+  changeRecipe(recipe: Recipe) {
+    let specifiedRecipes: { [item: string]: Recipe } = {};
     _.assign(specifiedRecipes, this.state.specifiedRecipes);
     specifiedRecipes[this.state.changingRecipeItem!] = recipe;
     this.setState(

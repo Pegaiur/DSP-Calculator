@@ -3,19 +3,19 @@ import styles from './SelectRecipeModal.less';
 import React from 'react';
 import { Modal, Row } from 'antd';
 import ItemImageAvatar from './ItemImageAvatar';
-import { RecipeModel, getRecipe } from '../recipes';
+import Recipe, { getRecipe } from '@/models/Recipe';
 import RecipeEntry from './RecipeEntry';
 
 interface IProps {
   isVisibale: boolean;
   changingRecipeItem: string;
-  changingRecipe: RecipeModel;
-  onOk(newRecipe: RecipeModel): void;
+  changingRecipe: Recipe;
+  onOk(newRecipe: Recipe): void;
   onCancel(): void;
 }
 
 interface IState {
-  selectedRecipe?: RecipeModel;
+  selectedRecipe?: Recipe;
 }
 
 export default class SelectRecipeModal extends React.Component<IProps, IState> {
@@ -27,7 +27,7 @@ export default class SelectRecipeModal extends React.Component<IProps, IState> {
     this.state = {};
   }
 
-  onSelect(recipe: RecipeModel) {
+  onSelect(recipe: Recipe) {
     this.setState({ selectedRecipe: recipe });
   }
 
