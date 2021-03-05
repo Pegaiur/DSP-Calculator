@@ -20,13 +20,12 @@ export default class ResultBuilding extends React.Component<IProps, IState> {
   }
 
   render() {
+    let buildings = this.props.result.buildings(this.props.globalParas);
+    const buidling = buildings[0];
+    const count = buildings[1];
     return (
       <div>
-        <ItemImageAvatar
-          item={this.props.result.recipe.building.name}
-          showName={true}
-        />
-        x{this.props.result.buildingCount(this.props.globalParas).toFixed(2)}
+        <ItemImageAvatar item={buidling} showName={true} />x{count.toFixed(1)}
       </div>
     );
   }

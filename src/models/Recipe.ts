@@ -1,6 +1,10 @@
 import { v4 as uuidv4 } from 'uuid';
 import GlobalParameter from './GlobalParameter';
-import Building, { miningBuildings, processBuildings } from './Building';
+import Building, {
+  benchDict,
+  miningBuildings,
+  processBuildings,
+} from './Building';
 
 export default class Recipe implements CompactRecipe {
   recipeID: string;
@@ -35,7 +39,7 @@ export default class Recipe implements CompactRecipe {
       (60 / time) *
       products[targetProduct] *
       this.building.productionMultiplier;
-    return this.isMiningRecipe()
+    return this.isMiningRecipe
       ? basicYPM * (1 + 0.1 * globalParameters.veinsUtilizationLevel)
       : basicYPM;
   }
@@ -66,8 +70,19 @@ export default class Recipe implements CompactRecipe {
     expectedYieldPerMin: number,
     globalParameters: GlobalParameter,
   ) {
-    let recipeYPM = this.recipeYPM(targetProduct, globalParameters);
-    return expectedYieldPerMin / recipeYPM;
+    let basicCount =
+      expectedYieldPerMin / this.recipeYPM(targetProduct, globalParameters);
+    if (
+      this.isMiningRecipe &&
+      this.building != miningBuildings.orbitalCollector
+    ) {
+      return (
+        expectedYieldPerMin /
+        this.building.productionMultiplier /
+        (1 + 0.1 * globalParameters.veinsUtilizationLevel)
+      );
+    }
+    return basicCount;
   }
 
   hasProduct(product: string) {
@@ -77,7 +92,18 @@ export default class Recipe implements CompactRecipe {
     return this.products[product] != undefined;
   }
 
-  isMiningRecipe() {
+  get processByBench() {
+    if (
+      this.building == processBuildings.benchMKI ||
+      this.building == processBuildings.benchMKII ||
+      this.building == processBuildings.benchMKIII
+    ) {
+      return true;
+    }
+    return false;
+  }
+
+  get isMiningRecipe() {
     return mineralRecipes.indexOf(this) != -1;
   }
 }
@@ -107,27 +133,35 @@ export function getRecipe(item: string) {
   return availableRecipes;
 }
 
+export function setGlobalParas(globalParas: GlobalParameter) {
+  recipes.forEach((recipe) => {
+    if (benchDict[recipe.building.name] != undefined) {
+      recipe.building = benchDict[globalParas.defaultBenchType];
+    }
+  });
+}
+
 function orbitalCollectorYPS(
   item: string,
   itemEnergy: { [item: string]: number },
   globalPara: { [item: string]: number },
   veinsUtilizationLevel: number,
 ) {
-  // PPS = Power Per Second
-  const itemPPS =
+  // EPS = Energy Per Second
+  const itemEPS =
     globalPara[item] *
     itemEnergy[item] *
     miningBuildings.orbitalCollector.productionMultiplier *
     (1 + 0.1 * veinsUtilizationLevel);
-  let totalPPS = 0;
+  let totalEPS = 0;
   for (let i in itemEnergy) {
-    totalPPS +=
+    totalEPS +=
       globalPara[i] *
       itemEnergy[i] *
       miningBuildings.orbitalCollector.productionMultiplier *
       (1 + 0.1 * veinsUtilizationLevel);
   }
-  const consumedYPS = ((itemPPS / totalPPS) * 30) / itemEnergy[item];
+  const consumedYPS = ((itemEPS / totalEPS) * 30) / itemEnergy[item];
   let itemYPS =
     globalPara[item] *
     60 *

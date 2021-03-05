@@ -1,4 +1,4 @@
-interface AllProcessBuilding {
+interface AllProcessBuilding extends Object {
   benchMKI: Building;
   benchMKII: Building;
   benchMKIII: Building;
@@ -10,7 +10,7 @@ interface AllProcessBuilding {
   institute: Building;
 }
 
-interface AllMiningBuilding {
+interface AllMiningBuilding extends Object {
   miningMachine: Building;
   pump: Building;
   oilExtractor: Building;
@@ -50,4 +50,10 @@ export const miningBuildings: AllMiningBuilding = {
   oilExtractor: new Building('原油萃取站', 1, 840),
   orbitalCollector: new Building('轨道采集器', 8, 0),
   rayReceiver: new Building('射线接收站', 1, 0),
+};
+
+export const benchDict: { [name: string]: Building } = {
+  制造台MKI: processBuildings.benchMKI,
+  制造台MKII: processBuildings.benchMKII,
+  制造台MKIII: processBuildings.benchMKIII,
 };

@@ -39,11 +39,17 @@ export default class Core {
       this.addResult(this.byproducts, production);
     });
     this.productions.forEach((production) => {
-      if (!production.recipe.isMiningRecipe()) {
+      if (!production.recipe.isMiningRecipe) {
         this.addConsumption(production);
       }
     });
     this.results.sort((aResult, bResult) => {
+      return (
+        allItemNameArray.indexOf(aResult.item) -
+        allItemNameArray.indexOf(bResult.item)
+      );
+    });
+    this.byproducts.sort((aResult, bResult) => {
       return (
         allItemNameArray.indexOf(aResult.item) -
         allItemNameArray.indexOf(bResult.item)
@@ -107,7 +113,7 @@ export default class Core {
         this.byproductions = this.byproductions.concat(
           production.byproducts(this.globalParameters),
         );
-        if (!recipe.isMiningRecipe()) {
+        if (!recipe.isMiningRecipe) {
           let materialYPMs = recipe.materialYPM(
             requirement.item,
             requirement.expectedYieldPerMin,
@@ -125,6 +131,9 @@ export default class Core {
   }
 
   private checkByproduction(requirement: Requirement) {
+    if (!this.globalParameters.avoidByproducts) {
+      return;
+    }
     for (let byproduction of this.byproductions) {
       if (requirement.item == byproduction.targetProduct) {
         if (requirement.expectedYieldPerMin - byproduction.ypm <= 0) {

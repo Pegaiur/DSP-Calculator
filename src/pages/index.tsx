@@ -17,8 +17,9 @@ import {
   Affix,
   Modal,
   message,
+  BackTop,
 } from 'antd';
-import Recipe from '@/models/Recipe';
+import Recipe, { setGlobalParas } from '@/models/Recipe';
 import Core from '@/models/Core';
 import DisplayResult from '@/models/DisplayResult';
 import GlobalParameter, {
@@ -31,6 +32,7 @@ import {
 } from '@ant-design/icons';
 import { faqString } from '../faq';
 import _ from 'lodash';
+import Building, { benchDict } from '@/models/Building';
 
 const { Content, Footer } = Layout;
 
@@ -60,6 +62,7 @@ export default class IndexPage extends React.Component<IProps, IState> {
       'addCalculation',
       'onChangeRecipe',
       'changeRecipe',
+      'onChangeBench',
       'onJump',
       'onChangeTarget',
     ]);
@@ -116,6 +119,14 @@ export default class IndexPage extends React.Component<IProps, IState> {
       isModalVisible: true,
       changingRecipe: currentRecipe,
       changingRecipeItem: item,
+    });
+  }
+
+  onChangeBench(recipe: Recipe, bench: string) {
+    recipe.building = benchDict[bench];
+    this.core.calculate(this.state.requirements, (results, byproducts) => {
+      this.setState({ results: results, byproducts: byproducts });
+      message.success('已更改制造台等级');
     });
   }
 
@@ -186,6 +197,7 @@ export default class IndexPage extends React.Component<IProps, IState> {
             results={this.state.results}
             globalParas={this.state.globalParas}
             onChangeRecipe={this.onChangeRecipe}
+            onChangeBench={this.onChangeBench}
           />
           <SelectRecipeModal
             isVisibale={this.state.isModalVisible}
@@ -221,12 +233,20 @@ export default class IndexPage extends React.Component<IProps, IState> {
       panel = (
         <GlobalParasPanel
           globalParas={this.state.globalParas}
-          onChangeGlobalParas={(paras) =>
+          onChangeGlobalParas={(paras) => {
             this.setState({
               globalParas: paras,
               isDrawerVisible: false,
-            })
-          }
+            });
+            setGlobalParas(this.state.globalParas);
+            this.core.calculate(
+              this.state.requirements,
+              (results, byproducts) => {
+                this.setState({ results: results, byproducts: byproducts });
+                message.success('已修改生产参数');
+              },
+            );
+          }}
         />
       );
     }
@@ -234,7 +254,7 @@ export default class IndexPage extends React.Component<IProps, IState> {
       <Layout>
         <PageHeader
           title="戴森球计划量化计算器"
-          subTitle="v0.3"
+          subTitle="v0.4"
           avatar={{ src: dspLogo }}
           extra={[
             <Button

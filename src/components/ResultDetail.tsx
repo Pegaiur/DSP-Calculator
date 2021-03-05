@@ -17,7 +17,9 @@ export default class ResultDetail extends React.Component<IProps, IState> {
   render() {
     let consumptions = Object.keys(this.props.result.consumptionDetail).map(
       (product) => {
-        return `${product} 消耗了 ${this.props.result.consumptionDetail[product]} 产量`;
+        return `${product} 消耗了 ${this.props.result.consumptionDetail[
+          product
+        ].toFixed(1)} 产量`;
       },
     );
     return (

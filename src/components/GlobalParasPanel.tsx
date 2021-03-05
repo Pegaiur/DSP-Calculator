@@ -1,5 +1,5 @@
 import React from 'react';
-import { Drawer, InputNumber, Button, Select } from 'antd';
+import { Drawer, InputNumber, Button, Select, Switch } from 'antd';
 import GlobalParameter, {
   defaultGlobalParameter,
 } from '@/models/GlobalParameter';
@@ -31,7 +31,7 @@ export default class GlobalParasPanel extends React.Component<IProps, IState> {
         <div>
           "矿物利用"升级等级：
           <InputNumber
-            min={1}
+            min={0}
             max={100}
             precision={0}
             defaultValue={this.props.globalParas.veinsUtilizationLevel}
@@ -47,7 +47,7 @@ export default class GlobalParasPanel extends React.Component<IProps, IState> {
         <div>
           默认制造台等级：
           <Select
-            defaultValue="lucy"
+            defaultValue={this.props.globalParas.defaultBenchType}
             value={this.state.modifiedParas.defaultBenchType}
             style={{ width: 120 }}
             onChange={(value) => {
@@ -58,6 +58,23 @@ export default class GlobalParasPanel extends React.Component<IProps, IState> {
             <Option value="制造台MKI">制造台MKI</Option>
             <Option value="制造台MKII">制造台MKII</Option>
             <Option value="制造台MKIII">制造台MKIII</Option>
+          </Select>
+        </div>
+        <br />
+        <div>
+          默认分馏塔传送带等级：
+          <Select
+            defaultValue="lucy"
+            value={this.state.modifiedParas.defaultFractionBeltType}
+            style={{ width: 120 }}
+            onChange={(value) => {
+              this.state.modifiedParas.defaultFractionBeltType = value;
+              this.setState({ modifiedParas: this.state.modifiedParas });
+            }}
+          >
+            <Option value="传送带">传送带</Option>
+            <Option value="高速传送带">高速传送带</Option>
+            <Option value="极速传送带">极速传送带</Option>
           </Select>
         </div>
         <br />
@@ -122,6 +139,17 @@ export default class GlobalParasPanel extends React.Component<IProps, IState> {
               this.setState({ modifiedParas: this.state.modifiedParas });
             }}
             key="veinsUtilizationLevel"
+          />
+        </div>
+        <br />
+        启用副产物规避（测试版）:
+        <div>
+          <Switch
+            defaultChecked={this.props.globalParas.avoidByproducts}
+            onChange={(value) => {
+              this.state.modifiedParas.avoidByproducts = value;
+              this.setState({ modifiedParas: this.state.modifiedParas });
+            }}
           />
         </div>
         <br />
