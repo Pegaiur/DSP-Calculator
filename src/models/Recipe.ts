@@ -720,6 +720,12 @@ export let recipes: Recipe[] = [
     time: 6,
     building: processBuildings.benchMKI,
   }),
+  new Recipe({
+    products: { 反物质燃料棒: 1 },
+    materials: { 反物质: 10, 氢: 10, 湮灭约束球: 1, 钛合金: 1 },
+    time: 12,
+    building: processBuildings.benchMKI,
+  }),
   // tier 8
   new Recipe({
     products: { 引力矩阵: 2 },
