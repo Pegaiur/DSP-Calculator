@@ -59,8 +59,9 @@ export default class Recipe implements CompactRecipe {
       materials = this.equivalentRecipe.materials;
     }
     for (let material in materials) {
-      let materialYPM = (60 / time) * materials[material] * ratio;
-      materialYPMs[material] = materialYPM;
+      let basicYPM =
+        (60 / time) * materials[material] * this.building.productionMultiplier;
+      materialYPMs[material] = basicYPM * ratio;
     }
     return materialYPMs;
   }
