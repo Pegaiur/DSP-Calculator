@@ -320,7 +320,7 @@ export const specialRecipes: Recipe[] = [
     products: { 金刚石: 1 },
     materials: { 金伯利矿石: 1 },
     time: 2,
-    building: processBuildings.refinery,
+    building: processBuildings.furnace,
   }),
   new Recipe({
     products: { 光子合并器: 1 },
