@@ -254,7 +254,7 @@ export default class IndexPage extends React.Component<IProps, IState> {
       <Layout>
         <PageHeader
           title="戴森球计划量化计算器"
-          subTitle="v0.41"
+          subTitle="v0.42"
           avatar={{ src: dspLogo }}
           extra={[
             <Button

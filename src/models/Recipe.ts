@@ -479,7 +479,7 @@ export let recipes: Recipe[] = [
     products: { 金刚石: 1 },
     materials: { 高能石墨: 1 },
     time: 2,
-    building: processBuildings.refinery,
+    building: processBuildings.furnace,
   }),
   new Recipe({
     products: { 磁线圈: 2 },
