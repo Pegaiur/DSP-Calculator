@@ -44,6 +44,9 @@ export default class Core {
       }
     });
     this.results.sort((aResult, bResult) => {
+      if (aResult.item == bResult.item) {
+        return 0.5 - Object.keys(bResult.consumptionDetail).length;
+      }
       return (
         allItemNameArray.indexOf(aResult.item) -
         allItemNameArray.indexOf(bResult.item)

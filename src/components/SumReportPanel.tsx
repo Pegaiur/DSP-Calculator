@@ -8,6 +8,11 @@ import Recipe from '@/models/Recipe';
 
 const { Title } = Typography;
 
+interface RenderObject {
+  children: React.ReactNode;
+  props: { [key: string]: number };
+}
+
 interface IProps {
   byproducts: DisplayResult[];
 }
@@ -20,9 +25,29 @@ export default class SumReportPanel extends React.Component<IProps, IState> {
       title: '物品',
       dataIndex: 'item',
       key: 'byproduct name',
-      render: (text: string, data: DisplayResult) => (
-        <ItemImageAvatar item={data.item} showName={true} />
-      ),
+      render: (text: string, data: DisplayResult, index: number) => {
+        let avatar = <ItemImageAvatar item={data.item} showName={true} />;
+        const obj: RenderObject = {
+          children: avatar,
+          props: { rowSpan: 1 },
+        };
+        if (index > 0) {
+          if (this.props.byproducts[index - 1].item == data.item) {
+            obj.props.rowSpan = 0;
+          }
+        }
+        if (
+          index < this.props.byproducts.length - 1 &&
+          obj.props.rowSpan != 0
+        ) {
+          for (let i = index + 1; i < this.props.byproducts.length; i++) {
+            if (this.props.byproducts[i].item == data.item) {
+              obj.props.rowSpan += 1;
+            }
+          }
+        }
+        return obj;
+      },
     },
     {
       title: '产量',
@@ -54,6 +79,7 @@ export default class SumReportPanel extends React.Component<IProps, IState> {
       <div>
         <Title level={3}>副产物</Title>
         <Table
+          size="small"
           pagination={false}
           columns={this.columns}
           dataSource={this.props.byproducts}

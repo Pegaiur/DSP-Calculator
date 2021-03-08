@@ -2,7 +2,6 @@ import styles from './ResultList.less';
 
 import React from 'react';
 import Recipe, { getRecipe } from '@/models/Recipe';
-import Building from '@/models/Building';
 import DisplayResult from '@/models/DisplayResult';
 import ResultDetail from './ResultDetail';
 import { Table, Typography, Select } from 'antd';
@@ -23,6 +22,11 @@ interface IProps {
 
 interface IState {}
 
+interface RenderObject {
+  children: React.ReactNode;
+  props: { [key: string]: number };
+}
+
 export default class ResultList extends React.Component<IProps, IState> {
   constructor(props: IProps, state: IState) {
     super(props, state);
@@ -37,11 +41,26 @@ export default class ResultList extends React.Component<IProps, IState> {
       title: '物品',
       dataIndex: 'item',
       key: 'name',
-      render: (text: string, data: DisplayResult) => (
-        <div>
-          <ItemImageAvatar item={data.item} showName={true} />
-        </div>
-      ),
+      render: (text: string, data: DisplayResult, index: number) => {
+        let avatar = <ItemImageAvatar item={data.item} showName={true} />;
+        const obj: RenderObject = {
+          children: avatar,
+          props: { rowSpan: 1 },
+        };
+        if (index > 0) {
+          if (this.props.results[index - 1].item == data.item) {
+            obj.props.rowSpan = 0;
+          }
+        }
+        if (index < this.props.results.length - 1 && obj.props.rowSpan != 0) {
+          for (let i = index + 1; i < this.props.results.length; i++) {
+            if (this.props.results[i].item == data.item) {
+              obj.props.rowSpan += 1;
+            }
+          }
+        }
+        return obj;
+      },
     },
     {
       title: '产量(个/每分钟)',
@@ -129,6 +148,7 @@ export default class ResultList extends React.Component<IProps, IState> {
       <div>
         <Title level={3}>计算结果</Title>
         <Table
+          size="small"
           pagination={false}
           columns={this.columns}
           expandable={{
