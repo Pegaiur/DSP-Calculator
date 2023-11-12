@@ -46,7 +46,7 @@ export default class ItemImageAvatar extends React.Component<IProps, IState> {
             }
           />
           {this.props.badgeNumber > 0 ? (
-            <sub>{this.props.badgeNumber}</sub>
+            <sub>{' ' + this.props.badgeNumber}</sub>
           ) : null}
         </div>
         {this.props.showName ? <span>{this.props.item}</span> : null}
