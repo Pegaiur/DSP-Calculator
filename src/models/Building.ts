@@ -48,7 +48,7 @@ export const processBuildings: AllProcessBuilding = {
 };
 
 export const miningBuildings: AllMiningBuilding = {
-  miningMachine: new Building('电驱矿机', 10, 2),
+  miningMachine: new Building('电驱矿机', 20, 2),
   farm: new Building('种植机', 30, 10), // 等效计算1倍效率制造
 };
 
