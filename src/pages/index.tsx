@@ -252,11 +252,7 @@ export default class IndexPage extends React.Component<IProps, IState> {
     }
     return (
       <Layout>
-        <PageHeader
-          title="明日方舟 终末地量化计算器"
-          subTitle="v0.15"
-          avatar={{ src: dspLogo }}
-        />
+        <PageHeader title="明日方舟 终末地量化计算器" subTitle="v0.15" />
         <Drawer
           title={this.state.isModifyingParas ? '修改生产参数' : '添加产能'}
           placement="left"

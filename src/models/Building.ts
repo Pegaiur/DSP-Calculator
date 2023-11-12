@@ -48,8 +48,8 @@ export const processBuildings: AllProcessBuilding = {
 };
 
 export const miningBuildings: AllMiningBuilding = {
-  miningMachine: new Building('二型电驱矿机', 10, 2), //缺1级矿机
-  farm: new Building('种植机', 1, 10),
+  miningMachine: new Building('电驱矿机', 10, 2),
+  farm: new Building('种植机', 30, 10), // 等效计算1倍效率制造
 };
 
 export const benchDict: { [name: string]: Building } = {

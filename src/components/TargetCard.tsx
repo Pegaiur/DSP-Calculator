@@ -22,14 +22,14 @@ export default class TargetCard extends React.Component<IProps, IState> {
     this.handleInput = this.handleInput.bind(this);
 
     this.state = {
-      expectedValue: 60,
+      expectedValue: 10,
     };
   }
 
   handleInput(value: string) {
     const inputValue = parseInt(value);
     if (isNaN(inputValue)) {
-      this.setState({ expectedValue: 60 });
+      this.setState({ expectedValue: 10 });
     } else {
       this.setState({ expectedValue: inputValue });
     }
