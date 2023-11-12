@@ -22,9 +22,9 @@ export default class InputPanel extends React.Component<IProps, IState> {
     this.handleSelect = this.handleSelect.bind(this);
 
     this.state = {
-      expectedValue: 60,
+      expectedValue: 1,
       warning: true,
-      targetItem: '宇宙矩阵',
+      targetItem: '三级恢复联剂',
     };
   }
 

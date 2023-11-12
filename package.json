@@ -1,7 +1,7 @@
 {
   "private": true,
   "scripts": {
-    "start": "umi dev",
+    "start": "cross-env NODE_OPTIONS=--openssl-legacy-provider umi dev --web",
     "build": "umi build",
     "postinstall": "umi generate tmp",
     "prettier": "prettier --write '**/*.{js,jsx,tsx,ts,less,md,json}'",
@@ -22,6 +22,7 @@
   "dependencies": {
     "@umijs/preset-react": "1.x",
     "antd": "^4.0.0",
+    "cross-env": "^7.0.3",
     "lodash": "^4.17.21",
     "umi": "^3.3.7",
     "uuid": "^8.3.2"

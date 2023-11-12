@@ -253,38 +253,9 @@ export default class IndexPage extends React.Component<IProps, IState> {
     return (
       <Layout>
         <PageHeader
-          title="戴森球计划量化计算器"
-          subTitle="v0.43"
+          title="明日方舟 终末地量化计算器"
+          subTitle="v0.15"
           avatar={{ src: dspLogo }}
-          extra={[
-            <Button
-              shape="round"
-              size="large"
-              key="global paras"
-              type="primary"
-              icon={<ProfileOutlined />}
-              onClick={() =>
-                this.setState({ isModifyingParas: true, isDrawerVisible: true })
-              }
-            >
-              修改生产参数
-            </Button>,
-            <Button
-              shape="round"
-              size="large"
-              key="faq"
-              icon={<QuestionCircleOutlined />}
-              onClick={() =>
-                Modal.info({
-                  title: 'FAQ',
-                  content: <div style={{ whiteSpace: 'pre' }}>{faqString}</div>,
-                  onOk() {},
-                })
-              }
-            >
-              FAQ
-            </Button>,
-          ]}
         />
         <Drawer
           title={this.state.isModifyingParas ? '修改生产参数' : '添加产能'}
@@ -312,7 +283,7 @@ export default class IndexPage extends React.Component<IProps, IState> {
           >
             TNA速通会
           </a>
-          ©️ 2021
+          ©️ 2023
         </Footer>
       </Layout>
     );

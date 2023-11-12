@@ -102,7 +102,7 @@ export default class ResultList extends React.Component<IProps, IState> {
         if (powerConsumption == 0) {
           return <div></div>;
         }
-        return <div>{powerConsumption.toFixed(0)} MW</div>;
+        return <div>{powerConsumption.toFixed(0)} 瓦格</div>;
       },
     },
     // { title: '传送带', dataIndex: '', key: '' },

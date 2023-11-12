@@ -2,20 +2,20 @@ interface AllProcessBuilding extends Object {
   benchMKI: Building;
   benchMKII: Building;
   benchMKIII: Building;
-  furnace: Building;
-  plant: Building;
   refinery: Building;
-  fractionator: Building;
-  collider: Building;
-  institute: Building;
+  smasher: Building;
+  grinder: Building;
+  seeder: Building;
+  filler: Building;
+  processor: Building;
+  embedder: Building;
+  shaper: Building;
+  wrapper: Building;
 }
 
 interface AllMiningBuilding extends Object {
   miningMachine: Building;
-  pump: Building;
-  oilExtractor: Building;
-  orbitalCollector: Building;
-  rayReceiver: Building;
+  farm: Building;
 }
 
 export default class Building {
@@ -28,7 +28,7 @@ export default class Building {
     this.name = name;
     this.productionMultiplier = productionMultiplier;
     this.powerKW = powerKW;
-    this.powerMW = this.powerKW / 1000;
+    this.powerMW = this.powerKW;
   }
 }
 
@@ -36,20 +36,20 @@ export const processBuildings: AllProcessBuilding = {
   benchMKI: new Building('制造台MKI', 0.75, 270),
   benchMKII: new Building('制造台MKII', 1, 380),
   benchMKIII: new Building('制造台MKIII', 1.5, 270),
-  furnace: new Building('电弧熔炉', 1, 360),
-  plant: new Building('化工厂', 1, 720),
-  refinery: new Building('原油精炼厂', 1, 960),
-  fractionator: new Building('分馏塔', 1, 720),
-  collider: new Building('微型粒子对撞机', 1, 12000),
-  institute: new Building('矩阵研究站', 1, 480),
+  refinery: new Building('精炼炉', 1, 5),
+  smasher: new Building('粉碎机', 1, 10),
+  grinder: new Building('研磨机', 1, 20),
+  seeder: new Building('采种机', 1, 10),
+  filler: new Building('灌装机', 1, 10),
+  processor: new Building('配件机', 1, 10),
+  embedder: new Building('嵌造机', 1, 10),
+  shaper: new Building('塑形机', 1, 10),
+  wrapper: new Building('封装机', 1, 30),
 };
 
 export const miningBuildings: AllMiningBuilding = {
-  miningMachine: new Building('采矿机', 30, 420),
-  pump: new Building('抽水站', 50, 300),
-  oilExtractor: new Building('原油萃取站', 1, 840),
-  orbitalCollector: new Building('轨道采集器', 8, 0),
-  rayReceiver: new Building('射线接收站', 1, 0),
+  miningMachine: new Building('二型电驱矿机', 10, 2), //缺1级矿机
+  farm: new Building('种植机', 1, 10),
 };
 
 export const benchDict: { [name: string]: Building } = {

@@ -17,7 +17,7 @@ export default class ItemSelect extends React.Component<IProps, IState> {
     this.handleChange = this.handleChange.bind(this);
 
     this.state = {
-      targetItem: '宇宙矩阵',
+      targetItem: '三级恢复联剂',
     };
   }
 
@@ -42,7 +42,7 @@ export default class ItemSelect extends React.Component<IProps, IState> {
         size="large"
         allowClear={false}
         placeholder="请选择目标产物"
-        defaultValue={['物品等级9', '宇宙矩阵']}
+        defaultValue={['物品等级6', '三级恢复联剂']}
         options={options}
         onChange={(value, selectedOptions) =>
           this.props.onChange(`${value[1]}`)
