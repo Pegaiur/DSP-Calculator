@@ -398,25 +398,25 @@ export let recipes: Recipe[] = [
   new Recipe({
     products: { 异铁瓶: 1 },
     materials: { 异铁块: 2 },
-    time: 2,
+    time: 4,
     building: processBuildings.shaper,
   }),
   new Recipe({
     products: { 类晶质瓶: 1 },
     materials: { 类晶纤维: 2 },
-    time: 2,
+    time: 4,
     building: processBuildings.shaper,
   }),
   new Recipe({
     products: { 钢质瓶: 1 },
     materials: { D32钢块: 2 },
-    time: 2,
+    time: 4,
     building: processBuildings.shaper,
   }),
   new Recipe({
     products: { 高晶质瓶: 1 },
     materials: { 高晶纤维: 2 },
-    time: 2,
+    time: 4,
     building: processBuildings.shaper,
   }),
   // 灌装机

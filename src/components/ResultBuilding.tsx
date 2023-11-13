@@ -4,6 +4,7 @@ import Recipe from '@/models/Recipe';
 import ItemImageAvatar from './ItemImageAvatar';
 import DisplayResult from '@/models/DisplayResult';
 import GlobalParameter from '@/models/GlobalParameter';
+import _ from 'lodash';
 
 interface IProps {
   result: DisplayResult;
@@ -25,7 +26,8 @@ export default class ResultBuilding extends React.Component<IProps, IState> {
     const count = buildings[1];
     return (
       <div>
-        <ItemImageAvatar item={buidling} showName={true} />x{count.toFixed(1)}
+        <ItemImageAvatar item={buidling} showName={true} /> x{' '}
+        <b>{_.ceil(count)}</b> ({count.toFixed(1)})
       </div>
     );
   }

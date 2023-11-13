@@ -9,6 +9,7 @@ import RecipeEntry from './RecipeEntry';
 import ResultBuilding from './ResultBuilding';
 import ItemImageAvatar from './ItemImageAvatar';
 import GlobalParameter from '@/models/GlobalParameter';
+import _ from 'lodash';
 
 const { Title } = Typography;
 const { Option } = Select;
@@ -72,7 +73,7 @@ export default class ResultList extends React.Component<IProps, IState> {
       ),
     },
     {
-      title: '设施/矿脉',
+      title: '设施/矿脉（按未取整计算产能）',
       dataIndex: 'building',
       key: 'building',
       width: 250,
@@ -94,7 +95,7 @@ export default class ResultList extends React.Component<IProps, IState> {
       ),
     },
     {
-      title: '耗能',
+      title: '耗能（取整计算）',
       dataIndex: '',
       key: 'power consumption',
       render: (text: string, data: DisplayResult) => {
@@ -146,7 +147,7 @@ export default class ResultList extends React.Component<IProps, IState> {
   render() {
     return (
       <div>
-        <Title level={3}>计算结果</Title>
+        <Title level={3}>-计算结果</Title>
         <Table
           size="small"
           pagination={false}

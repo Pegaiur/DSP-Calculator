@@ -61,6 +61,6 @@ export default class DisplayResult {
     if (this.recipe.building == processBuildings.fractionator) {
       count = count / fractionatorBeltDict[globalParas.defaultFractionBeltType];
     }
-    return this.recipe.building.powerMW * count;
+    return this.recipe.building.powerMW * _.ceil(count);
   }
 }
